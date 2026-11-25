@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MediCare Plus Hospital - departments, doctors, timings and contact information.">
+  <meta name="author" content="MediCare Plus Web Team">
+  <title>MediCare Plus Hospital | Healthcare You Can Trust</title>
+  <style>
+    :root { --primary:#0b6e8a; --dark:#08394a; --light:#eaf6fa; --accent:#e8f1f5; --text:#1d2b33; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:"Segoe UI",Arial,sans-serif; line-height:1.6; color:var(--text); background:#fff; }
+    a { color:var(--primary); }
+    img { max-width:100%; height:auto; display:block; }
+    .container { width:min(1100px,92%); margin-inline:auto; }
+
+    /* Header & navigation */
+    .site-header { background:var(--dark); color:#fff; position:sticky; top:0; z-index:10; }
+    .site-header .container { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:.5rem; padding:.6rem 0; }
+    .brand { display:flex; align-items:center; gap:.6rem; font-size:1.3rem; font-weight:700; color:#fff; text-decoration:none; }
+    .brand img { width:40px; height:40px; }
+    nav ul { list-style:none; display:flex; flex-wrap:wrap; gap:1.2rem; }
+    nav a { color:#cfe9f2; text-decoration:none; font-weight:500; }
+    nav a:hover, nav a:focus { color:#fff; text-decoration:underline; }
+
+    /* Hero */
+    .hero { background:linear-gradient(120deg,var(--light),#fff); padding:3rem 0; }
+    .hero .container { display:grid; grid-template-columns:1.1fr 1fr; gap:2rem; align-items:center; }
+    .hero h1 { font-size:2.2rem; color:var(--dark); line-height:1.2; margin-bottom:.8rem; }
+    .btn { display:inline-block; margin-top:1rem; padding:.7rem 1.4rem; background:var(--primary); color:#fff; border-radius:6px; text-decoration:none; font-weight:600; }
+
+    section { padding:2.5rem 0; }
+    section:nth-of-type(even) { background:var(--accent); }
+    h2 { color:var(--dark); margin-bottom:1rem; border-left:5px solid var(--primary); padding-left:.7rem; }
+    h3 { color:var(--primary); margin-bottom:.4rem; }
+
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.2rem; }
+    article.card { background:#fff; border:1px solid #d3e4ea; border-radius:10px; padding:1.2rem; box-shadow:0 2px 6px rgba(0,0,0,.05); }
+    article.card ul { margin:.5rem 0 0 1.2rem; }
+
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; background:#fff; }
+    caption { text-align:left; font-weight:600; padding:.5rem 0; color:var(--dark); }
+    th, td { border:1px solid #c9dde4; padding:.6rem .8rem; text-align:left; }
+    thead th { background:var(--primary); color:#fff; }
+    tbody tr:nth-child(even) { background:#f4fafc; }
+    tfoot td { font-style:italic; background:var(--light); }
+
+    .two-col { display:grid; grid-template-columns:2fr 1fr; gap:1.5rem; }
+    aside { background:#fff; border:1px solid #d3e4ea; border-radius:10px; padding:1.2rem; }
+    figure { margin-bottom:1rem; }
+    figcaption { font-size:.9rem; color:#55707c; margin-top:.3rem; }
+    details { background:#fff; border:1px solid #d3e4ea; border-radius:8px; padding:.7rem 1rem; margin-bottom:.6rem; }
+    summary { cursor:pointer; font-weight:600; color:var(--dark); }
+    ol { margin-left:1.3rem; }
+    dl dt { font-weight:700; margin-top:.5rem; }
+    dl dd { margin-left:1rem; }
+
+    .site-footer { background:var(--dark); color:#cfe9f2; padding:2rem 0 1rem; }
+    .footer-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.5rem; }
+    .site-footer a { color:#fff; }
+    .site-footer h3 { color:#fff; }
+    .site-footer ul { list-style:none; }
+    .copy { text-align:center; margin-top:1.5rem; font-size:.85rem; border-top:1px solid #2c5a6c; padding-top:.8rem; }
+    .skip { position:absolute; left:-999px; }
+    .skip:focus { left:0; background:#fff; padding:.5rem; }
+
+    @media (max-width:760px) { .hero .container, .two-col { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+
+  <!-- ========== HEADER + NAVIGATION ========== -->
+  <header class="site-header" id="top">
+    <div class="container">
+      <a class="brand" href="#top" aria-label="MediCare Plus home">
+        <img alt="MediCare Plus logo" width="40" height="40"
+             src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%230b6e8a'/><rect x='27' y='14' width='10' height='36' rx='2' fill='white'/><rect x='14' y='27' width='36' height='10' rx='2' fill='white'/></svg>">
+        MediCare Plus
+      </a>
+      <nav aria-label="Primary navigation">
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#departments">Departments</a></li>
+          <li><a href="#doctors">Doctors</a></li>
+          <li><a href="#timings">Timings</a></li>
+          <li><a href="#news">News</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ========== HERO ========== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container">
+        <div>
+          <p><strong>Multi-Speciality Hospital &bull; Since 1998</strong></p>
+          <h1 id="hero-title">Compassionate Care, Advanced Medicine.</h1>
+          <p>MediCare Plus brings together experienced specialists, modern diagnostics and 24/7 emergency services under one roof.</p>
+          <a class="btn" href="#contact">Book an Appointment</a>
+        </div>
+        <figure>
+          <img alt="Illustration of a hospital building with a medical cross" width="520" height="320"
+               src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 320'><rect width='520' height='320' rx='16' fill='%23d6edf5'/><rect x='150' y='60' width='220' height='220' fill='white' stroke='%230b6e8a' stroke-width='4'/><rect x='240' y='90' width='40' height='110' fill='%230b6e8a'/><rect x='205' y='125' width='110' height='40' fill='%230b6e8a'/><rect x='235' y='220' width='50' height='60' fill='%2308394a'/><g fill='%230b6e8a' opacity='.5'><rect x='170' y='80' width='30' height='24'/><rect x='320' y='80' width='30' height='24'/><rect x='170' y='220' width='30' height='24'/><rect x='320' y='220' width='30' height='24'/></g></svg>">
+          <figcaption>Our main campus: 300 beds, 12 operation theatres.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ========== ABOUT ========== -->
+    <section id="about" aria-labelledby="about-title">
+      <div class="container two-col">
+        <div>
+          <h2 id="about-title">About Us</h2>
+          <p>Founded in 1998, <strong>MediCare Plus</strong> is a NABH-accredited hospital serving more than 200,000 patients every year. Our mission is to deliver <em>safe, affordable and ethical</em> healthcare to every family.</p>
+          <p>Our core values:</p>
+          <ul>
+            <li>Patient-first care</li>
+            <li>Clinical excellence</li>
+            <li>Transparency and integrity</li>
+            <li>Continuous innovation</li>
+          </ul>
+        </div>
+        <aside aria-label="Hospital at a glance">
+          <h3>At a Glance</h3>
+          <dl>
+            <dt>Beds</dt><dd>300</dd>
+            <dt>Specialists</dt><dd>120+</dd>
+            <dt>Emergency</dt><dd>24 &times; 7</dd>
+            <dt>Accreditation</dt><dd>NABH, NABL</dd>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========== DEPARTMENTS (articles) ========== -->
+    <section id="departments" aria-labelledby="dept-title">
+      <div class="container">
+        <h2 id="dept-title">Our Departments</h2>
+        <div class="cards">
+          <article class="card">
+            <h3>Cardiology</h3>
+            <p>Complete heart care from prevention to surgery.</p>
+            <ul><li>ECG &amp; Echocardiography</li><li>Angioplasty</li><li>Bypass surgery</li></ul>
+          </article>
+          <article class="card">
+            <h3>Orthopaedics</h3>
+            <p>Bone, joint and sports injury treatment.</p>
+            <ul><li>Joint replacement</li><li>Arthroscopy</li><li>Physiotherapy</li></ul>
+          </article>
+          <article class="card">
+            <h3>Paediatrics</h3>
+            <p>Gentle care for newborns, children and teens.</p>
+            <ul><li>Vaccination</li><li>NICU</li><li>Growth monitoring</li></ul>
+          </article>
+          <article class="card">
+            <h3>Neurology</h3>
+            <p>Diagnosis and treatment of brain and nerve disorders.</p>
+            <ul><li>EEG &amp; MRI</li><li>Stroke unit</li><li>Epilepsy clinic</li></ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== DOCTORS (table) ========== -->
+    <section id="doctors" aria-labelledby="doc-title">
+      <div class="container">
+        <h2 id="doc-title">Our Specialists</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>Consultant doctors and OPD availability</caption>
+            <thead>
+              <tr>
+                <th scope="col">Doctor</th>
+                <th scope="col">Department</th>
+                <th scope="col">Experience</th>
+                <th scope="col">OPD Days</th>
+                <th scope="col">Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Dr. Anitha Raman</th><td>Cardiology</td><td>18 years</td><td>Mon, Wed, Fri</td><td><a href="#contact">Book</a></td></tr>
+              <tr><th scope="row">Dr. Rahul Menon</th><td>Orthopaedics</td><td>14 years</td><td>Tue, Thu, Sat</td><td><a href="#contact">Book</a></td></tr>
+              <tr><th scope="row">Dr. Priya Nair</th><td>Paediatrics</td><td>11 years</td><td>Mon&ndash;Sat</td><td><a href="#contact">Book</a></td></tr>
+              <tr><th scope="row">Dr. Karthik Subramaniam</th><td>Neurology</td><td>20 years</td><td>Mon, Thu</td><td><a href="#contact">Book</a></td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td colspan="5">Schedules may change; please confirm before visiting.</td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== TIMINGS ========== -->
+    <section id="timings" aria-labelledby="time-title">
+      <div class="container two-col">
+        <div>
+          <h2 id="time-title">Visiting &amp; Service Hours</h2>
+          <div class="table-wrap">
+            <table>
+              <caption>Weekly service timings</caption>
+              <thead><tr><th scope="col">Service</th><th scope="col">Hours</th></tr></thead>
+              <tbody>
+                <tr><td>Emergency</td><td><time datetime="00:00">24 hours</time>, all days</td></tr>
+                <tr><td>OPD</td><td><time datetime="09:00">9:00 AM</time> &ndash; <time datetime="17:00">5:00 PM</time></td></tr>
+                <tr><td>Pharmacy</td><td><time datetime="08:00">8:00 AM</time> &ndash; <time datetime="22:00">10:00 PM</time></td></tr>
+                <tr><td>Visitors</td><td><time datetime="16:00">4:00 PM</time> &ndash; <time datetime="19:00">7:00 PM</time></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <aside aria-label="Appointment steps">
+          <h3>How to Book</h3>
+          <ol>
+            <li>Choose a department</li>
+            <li>Call or email us</li>
+            <li>Receive confirmation</li>
+            <li>Arrive 15 minutes early</li>
+          </ol>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========== NEWS ========== -->
+    <section id="news" aria-labelledby="news-title">
+      <div class="container">
+        <h2 id="news-title">News &amp; Health Tips</h2>
+        <div class="cards">
+          <article class="card">
+            <header>
+              <h3>Free Heart Check-up Camp</h3>
+              <p><small>Published <time datetime="2026-11-10">10 Nov 2026</time></small></p>
+            </header>
+            <p>Join our community camp this month for free blood pressure, ECG and cholesterol screening.</p>
+            <footer><a href="#contact">Register now</a></footer>
+          </article>
+          <article class="card">
+            <header>
+              <h3>5 Tips for a Healthy Winter</h3>
+              <p><small>Published <time datetime="2026-11-05">5 Nov 2026</time></small></p>
+            </header>
+            <p>Stay hydrated, keep active, eat seasonal fruit, get your flu shot and sleep well.</p>
+            <footer><a href="https://www.who.int/health-topics" target="_blank" rel="noopener noreferrer">Read more (WHO)</a></footer>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FAQ ========== -->
+    <section id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <h2 id="faq-title">Frequently Asked Questions</h2>
+        <details>
+          <summary>Do I need an appointment for OPD?</summary>
+          <p>Appointments are recommended, but walk-ins are accepted during OPD hours.</p>
+        </details>
+        <details>
+          <summary>Which insurance providers are accepted?</summary>
+          <p>We accept most major insurers and government health schemes. Please carry your policy card.</p>
+        </details>
+        <details>
+          <summary>Is parking available?</summary>
+          <p>Yes, free parking is available for patients and visitors.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ========== CONTACT ========== -->
+    <section id="contact" aria-labelledby="contact-title">
+      <div class="container two-col">
+        <div>
+          <h2 id="contact-title">Contact Us</h2>
+          <address>
+            <strong>MediCare Plus Hospital</strong><br>
+            12, Health Avenue, Race Course Road<br>
+            Coimbatore, Tamil Nadu 641018<br><br>
+            Phone: <a href="tel:+914222000000">+91 422 200 0000</a><br>
+            Email: <a href="mailto:care@medicareplus.example">care@medicareplus.example</a>
+          </address>
+        </div>
+        <aside aria-label="Emergency contact">
+          <h3>Emergency</h3>
+          <p>Call our 24/7 ambulance helpline:</p>
+          <p><a href="tel:108"><strong>108</strong></a></p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3>MediCare Plus</h3>
+          <p>Healthcare you can trust, every day.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#departments">Departments</a></li>
+            <li><a href="#doctors">Doctors</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+        <div>
+          <h3>Follow Us</h3>
+          <ul>
+            <li><a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+            <li><a href="https://www.x.com" target="_blank" rel="noopener noreferrer">X</a></li>
+            <li><a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="copy">&copy; 2026 MediCare Plus Hospital. All rights reserved. <a href="#top">Back to top &uarr;</a></p>
+    </div>
+  </footer>
+</body>
+</html>
