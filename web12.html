@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXORA | Retail Industry Dashboard</title>
+<style>
+  :root { --bg:#0b1020; --card:#151c33; --line:#26304f; --text:#e8ecf8; --mute:#8d98bb; --a:#6c8cff; --b:#27e1c1; --err:#ff6b6b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  /* ===== Entrance logo splash ===== */
+  #splash { position:fixed; inset:0; z-index:99; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 40%, #1a2350, #070a16 70%); transition:opacity .8s, visibility .8s; overflow:hidden; }
+  #splash.hide { opacity:0; visibility:hidden; }
+  .orbit { position:absolute; border:1px solid rgba(108,140,255,.25); border-radius:50%; animation:spin linear infinite; }
+  .orbit:nth-child(1){ width:340px; height:340px; animation-duration:14s; }
+  .orbit:nth-child(2){ width:520px; height:520px; animation-duration:22s; animation-direction:reverse; border-style:dashed; }
+  .orbit:nth-child(3){ width:720px; height:720px; animation-duration:30s; }
+  .orbit::after { content:''; position:absolute; top:-5px; left:50%; width:10px; height:10px; border-radius:50%; background:var(--b); box-shadow:0 0 14px var(--b); }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  #logo { width:150px; height:150px; position:relative; z-index:2; filter:drop-shadow(0 0 18px rgba(108,140,255,.6)); animation:pop 1s .2s both cubic-bezier(.2,1.6,.4,1); }
+  @keyframes pop { from { transform:scale(.2) rotate(-90deg); opacity:0; } to { transform:none; opacity:1; } }
+  .draw { fill:none; stroke:url(#g); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:400; stroke-dashoffset:400; animation:draw 1.8s .3s forwards; }
+  .draw.d2 { animation-delay:.9s; }
+  .core { fill:url(#g); opacity:0; transform-origin:50px 50px; animation:glow 1.2s 1.6s forwards, pulse 1.6s 2.8s infinite; }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  @keyframes glow { to { opacity:1; } }
+  @keyframes pulse { 50% { transform:scale(1.25); } }
+  .brand { display:flex; gap:4px; margin-top:26px; z-index:2; font-size:2.6rem; font-weight:800; letter-spacing:.25em; }
+  .brand span { opacity:0; transform:translateY(30px); animation:rise .6s forwards; background:linear-gradient(90deg,var(--a),var(--b)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  @keyframes rise { to { opacity:1; transform:none; } }
+  .tag { z-index:2; margin-top:10px; color:var(--mute); letter-spacing:.35em; font-size:.75rem; text-transform:uppercase; opacity:0; animation:rise .8s 2.3s forwards; }
+  .bar { z-index:2; margin-top:28px; width:220px; height:4px; background:var(--line); border-radius:4px; overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--a),var(--b)); animation:fill 3s .2s forwards; }
+  @keyframes fill { to { width:100%; } }
+  #skip { z-index:3; position:absolute; bottom:24px; right:24px; background:none; border:1px solid var(--line); color:var(--mute); padding:6px 14px; border-radius:20px; cursor:pointer; }
+
+  /* ===== Dashboard ===== */
+  header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; padding:18px 28px; border-bottom:1px solid var(--line); }
+  header h1 { font-size:1.2rem; letter-spacing:.15em; }
+  header p { color:var(--mute); font-size:.85rem; }
+  main { max-width:1100px; margin:0 auto; padding:24px 20px 60px; }
+  .tabs { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  button.tab, button.act { background:var(--card); color:var(--text); border:1px solid var(--line); padding:9px 18px; border-radius:8px; cursor:pointer; font-size:.9rem; transition:.2s; }
+  button.tab:hover, button.act:hover { border-color:var(--a); }
+  button.tab.active { background:linear-gradient(90deg,var(--a),var(--b)); color:#06101f; border:none; font-weight:700; }
+  button.act.danger { border-color:var(--err); color:var(--err); margin-left:auto; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:20px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .stat small { color:var(--mute); display:block; margin-bottom:6px; }
+  .stat b { font-size:1.6rem; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; position:relative; min-height:200px; }
+  .scroll { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.92rem; }
+  th, td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { color:var(--mute); font-weight:600; text-transform:uppercase; font-size:.75rem; letter-spacing:.08em; }
+  tr:hover td { background:rgba(108,140,255,.07); }
+  td img { width:40px; height:40px; border-radius:8px; background:#222a48; vertical-align:middle; margin-right:10px; object-fit:cover; }
+  .badge { padding:3px 9px; border-radius:20px; font-size:.75rem; }
+  .ok { background:rgba(39,225,193,.15); color:var(--b); } .low { background:rgba(255,107,107,.15); color:var(--err); }
+  .stars { color:#ffc857; }
+
+  /* Loader + error */
+  #loader { display:none; position:absolute; inset:0; background:rgba(21,28,51,.92); z-index:5; border-radius:12px; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+  .spinner { width:46px; height:46px; border:4px solid var(--line); border-top-color:var(--b); border-radius:50%; animation:spin .8s linear infinite; }
+  #error { display:none; text-align:left; padding:12px 16px; margin-bottom:12px; border:1px solid var(--err); border-radius:10px; background:rgba(255,107,107,.08); }
+  #error h3 { color:var(--err); margin-bottom:4px; font-size:1rem; }
+  #error p { color:var(--mute); margin-bottom:10px; font-size:.85rem; }
+</style>
+</head>
+<body>
+
+<!-- Entrance logo -->
+<section id="splash">
+  <div class="orbit"></div><div class="orbit"></div><div class="orbit"></div>
+  <svg id="logo" viewBox="0 0 100 100">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6c8cff"/><stop offset="1" stop-color="#27e1c1"/></linearGradient></defs>
+    <polygon class="draw" points="50,6 90,28 90,72 50,94 10,72 10,28"/>
+    <path class="draw d2" d="M32 68 V32 L68 68 V32"/>
+    <circle class="core" cx="50" cy="50" r="5"/>
+  </svg>
+  <div class="brand" id="brand"></div>
+  <div class="tag">Industry Intelligence Platform</div>
+  <div class="bar"><i></i></div>
+  <button id="skip">Skip ›</button>
+</section>
+
+<header>
+  <div><h1>NEXORA</h1><p>Retail &amp; E-Commerce Industry Dashboard · live API data</p></div>
+  <p id="stamp">Not loaded yet</p>
+</header>
+
+<main>
+  <div class="tabs" id="tabs"></div>
+  <div class="stats" id="stats"></div>
+
+  <div class="panel">
+    <div id="loader"><div class="spinner"></div><p>Fetching data from API…</p></div>
+    <div id="error">
+      <h3 id="errTitle">Something went wrong</h3>
+      <p id="errMsg"></p>
+      <button class="act" id="retry">↻ Retry</button>
+    </div>
+    <div class="scroll"><table id="tbl">
+      <thead><tr><th>Product</th><th>Brand</th><th>Price</th><th>Rating</th><th>Stock</th></tr></thead>
+      <tbody id="body"></tbody>
+    </table></div>
+  </div>
+</main>
+
+<script>
+  const API = 'https://dummyjson.com/products/category/';
+  const SECTORS = { smartphones:'Smartphones', laptops:'Laptops', groceries:'Groceries', furniture:'Furniture' };
+  let current = 'smartphones';
+
+  // ---- Entrance logo ----
+  const brand = document.getElementById('brand');
+  [...'NEXORA'].forEach((ch, i) => {
+    const s = document.createElement('span');
+    s.textContent = ch; s.style.animationDelay = (1.2 + i * 0.12) + 's';
+    brand.appendChild(s);
+  });
+  const splash = document.getElementById('splash');
+  const closeSplash = () => splash.classList.add('hide');
+  setTimeout(closeSplash, 3600);
+  document.getElementById('skip').onclick = closeSplash;
+
+  // ---- UI helpers ----
+  const $ = id => document.getElementById(id);
+  const setLoading = on => { $('loader').style.display = on ? 'flex' : 'none'; };
+  const showError = (title, msg) => {
+    $('errTitle').textContent = title; $('errMsg').textContent = msg;
+    $('error').style.display = 'block';
+  };
+  const hideError = () => { $('error').style.display = 'none'; };
+
+  // Offline sample data, shown when the API cannot be reached
+  const FALLBACK = {
+    smartphones: [
+      { title:'iPhone 15', brand:'Apple', price:799, rating:4.7, stock:34 },
+      { title:'Galaxy S24', brand:'Samsung', price:749, rating:4.5, stock:18 },
+      { title:'Pixel 8', brand:'Google', price:699, rating:4.4, stock:42 },
+      { title:'OnePlus 12', brand:'OnePlus', price:649, rating:4.3, stock:9 }
+    ],
+    laptops: [
+      { title:'MacBook Air M2', brand:'Apple', price:1099, rating:4.8, stock:25 },
+      { title:'ThinkPad X1', brand:'Lenovo', price:1399, rating:4.6, stock:12 },
+      { title:'XPS 13', brand:'Dell', price:1199, rating:4.4, stock:30 },
+      { title:'Zenbook 14', brand:'Asus', price:899, rating:4.2, stock:7 }
+    ],
+    groceries: [
+      { title:'Basmati Rice 5kg', brand:'India Gate', price:12, rating:4.6, stock:120 },
+      { title:'Olive Oil 1L', brand:'Borges', price:9, rating:4.3, stock:60 },
+      { title:'Green Tea', brand:'Lipton', price:5, rating:4.1, stock:15 },
+      { title:'Almonds 500g', brand:'Happilo', price:11, rating:4.5, stock:8 }
+    ],
+    furniture: [
+      { title:'Office Chair', brand:'Ergo', price:149, rating:4.4, stock:22 },
+      { title:'Study Desk', brand:'Woodex', price:199, rating:4.2, stock:14 },
+      { title:'Bookshelf', brand:'Nilkamal', price:89, rating:4.0, stock:40 },
+      { title:'Sofa 3-Seater', brand:'Urban', price:549, rating:4.6, stock:5 }
+    ]
+  };
+
+  function buildTabs() {
+    Object.entries(SECTORS).forEach(([key, label]) => {
+      const b = document.createElement('button');
+      b.className = 'tab' + (key === current ? ' active' : '');
+      b.textContent = label;
+      b.onclick = () => {
+        current = key;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        b.classList.add('active');
+        loadData(API + key);
+      };
+      $('tabs').appendChild(b);
+    });
+    const bad = document.createElement('button');
+    bad.className = 'act danger'; bad.textContent = '⚠ Simulate error';
+    bad.onclick = () => loadData('https://dummyjson.com/invalid-endpoint-404');
+    $('tabs').appendChild(bad);
+  }
+
+  function cell(tr, text) { const td = document.createElement('td'); td.textContent = text; tr.appendChild(td); return td; }
+
+  function renderStats(items) {
+    const avgP = items.reduce((s, p) => s + p.price, 0) / items.length;
+    const avgR = items.reduce((s, p) => s + p.rating, 0) / items.length;
+    const stock = items.reduce((s, p) => s + p.stock, 0);
+    $('stats').textContent = '';
+    [['Products', items.length], ['Avg. price', '$' + avgP.toFixed(2)], ['Avg. rating', avgR.toFixed(2) + ' / 5'], ['Units in stock', stock]]
+      .forEach(([k, v]) => {
+        const d = document.createElement('div'); d.className = 'stat';
+        const s = document.createElement('small'); s.textContent = k;
+        const b = document.createElement('b'); b.textContent = v;
+        d.appendChild(s); d.appendChild(b); $('stats').appendChild(d);
+      });
+  }
+
+  function renderTable(items) {
+    const body = $('body'); body.textContent = '';
+    items.forEach(p => {
+      const tr = document.createElement('tr');
+      const first = document.createElement('td');
+      if (p.thumbnail) {
+        const img = document.createElement('img'); img.src = p.thumbnail; img.alt = ''; img.loading = 'lazy';
+        first.appendChild(img);
+      }
+      first.appendChild(document.createTextNode(p.title));
+      tr.appendChild(first);
+      cell(tr, p.brand || '—');
+      cell(tr, '$' + p.price.toFixed(2));
+      const r = cell(tr, '★ ' + p.rating.toFixed(1)); r.className = 'stars';
+      const st = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = 'badge ' + (p.stock > 20 ? 'ok' : 'low');
+      badge.textContent = p.stock + (p.stock > 20 ? ' in stock' : ' low');
+      st.appendChild(badge); tr.appendChild(st);
+      body.appendChild(tr);
+    });
+  }
+
+  // ---- Fetch ----
+  let lastUrl = API + current;
+  async function loadData(url) {
+    lastUrl = url; hideError(); setLoading(true);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const response = await fetch(url, { signal: ctrl.signal });
+      if (!response.ok) throw new Error('Server responded with HTTP ' + response.status);
+      const data = await response.json();
+      if (!data.products || !data.products.length) throw new Error('The endpoint returned no records.');
+      renderStats(data.products);
+      renderTable(data.products);
+      $('stamp').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    } catch (err) {
+      const timeout = err.name === 'AbortError';
+      showError(timeout ? 'Request timed out' : 'Failed to load live data',
+                (timeout ? 'The server took too long to respond.' : err.message) + ' Showing offline sample data instead.');
+      const fb = FALLBACK[current];
+      renderStats(fb);
+      renderTable(fb);
+      $('stamp').textContent = 'Offline sample data';
+    } finally {
+      clearTimeout(timer);
+      setLoading(false);
+    }
+  }
+
+  $('retry').onclick = () => loadData(API + current);
+  buildTabs();
+  loadData(API + current);
+</script>
+</body>
+</html>

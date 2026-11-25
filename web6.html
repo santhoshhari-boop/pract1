@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CSS Positioning in Practice</title>
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--text:#16202e;--muted:#5b6778;--line:#dfe3ea;--accent:#0b6bcb;--accent-text:#fff;--code:#0f1b2d;--code-text:#d7e3f4;--ok:#1a7f4b;--warn:#c2410c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e141d;--surface:#161e2a;--text:#e8edf4;--muted:#9aa7b8;--line:#2a3547;--accent:#5aa7ff;--accent-text:#06121f;--code:#080d14;--code-text:#cfe0f5;--ok:#4cc38a;--warn:#fb923c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e141d;--surface:#161e2a;--text:#e8edf4;--muted:#9aa7b8;--line:#2a3547;--accent:#5aa7ff;--accent-text:#06121f;--code:#080d14;--code-text:#cfe0f5;--ok:#4cc38a;--warn:#fb923c;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+/* FIXED navbar */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:16px;padding:12px 20px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:var(--surface);border-bottom:1px solid var(--line)}
+.nav b{font-size:1.05rem}.nav .sp{flex:1}
+.nav a{color:var(--muted);text-decoration:none;font-size:.9rem}.nav a:hover{color:var(--accent)}
+.nav button{background:none;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:4px 10px;cursor:pointer}
+@media(max-width:640px){.nav a{display:none}}
+main{max-width:1050px;margin:0 auto;padding:96px 20px 100px}
+.hero{padding:24px 0 8px}.hero h1{font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.15;margin:0 0 8px}
+.hero p{color:var(--muted);max-width:60ch;margin:0}
+.layout{display:grid;grid-template-columns:200px 1fr;gap:32px;margin-top:32px;align-items:start}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+/* STICKY sidebar */
+.toc{position:sticky;top:80px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.toc h4{margin:0 0 8px;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc a{display:block;padding:5px 8px;border-radius:6px;color:var(--text);text-decoration:none;font-size:.92rem}
+.toc a:hover{background:var(--bg);color:var(--accent)}
+@media(max-width:800px){.toc{position:static}}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:24px}
+section h2{margin:0 0 4px;font-size:1.3rem}
+.tag{display:inline-block;font:600 .72rem ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--accent);margin-left:8px;vertical-align:middle}
+.lead{color:var(--muted);margin:0 0 14px}
+pre{background:var(--code);color:var(--code-text);padding:12px 14px;border-radius:10px;overflow-x:auto;font:.82rem/1.5 ui-monospace,Menlo,monospace;margin:12px 0 0}
+.use{font-size:.9rem;margin:10px 0 0}.use b{color:var(--ok)}
+/* STATIC */
+.flow{display:grid;gap:8px}.flow div{background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:10px 14px;position:static}
+/* RELATIVE + ABSOLUTE */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{position:relative;border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--bg);top:0;transition:top .2s}
+.card:hover{top:-4px;border-color:var(--accent)}
+.card h3{margin:0 0 4px;font-size:1rem}.card p{margin:0;color:var(--muted);font-size:.88rem}
+.badge{position:absolute;top:-10px;right:-8px;background:var(--warn);color:#fff;font-size:.72rem;font-weight:700;border-radius:999px;padding:2px 9px}
+.ribbon{position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--accent);border-radius:0 0 12px 12px}
+/* STICKY table */
+.scroller{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--line)}
+thead th{position:sticky;top:0;background:var(--surface);z-index:1;box-shadow:0 1px 0 var(--line)}
+td.s{color:var(--ok);font-weight:600}td.d{color:var(--warn);font-weight:600}
+/* Playground */
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.ctrl label{border:1px solid var(--line);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:.9rem}
+.ctrl input{position:absolute;opacity:0;pointer-events:none}
+.ctrl label:has(input:checked){background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.ctrl label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.stage{position:relative;height:260px;overflow:auto;border:2px solid var(--accent);border-radius:12px;background:var(--bg)}
+.stage .fill{padding:14px;color:var(--muted);font-size:.88rem}.stage .fill p{margin:0 0 12px}
+#box{background:var(--accent);color:var(--accent-text);padding:10px 14px;border-radius:8px;width:150px;font-weight:600;font-size:.88rem;top:10px;left:10px;z-index:2;margin:0 14px}
+/* FIXED chat button */
+.chat{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--accent);color:var(--accent-text);border:0;border-radius:999px;padding:12px 18px;font-weight:600;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+footer{text-align:center;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<header class="nav"><b>▣ Northwind Logistics</b><span class="sp"></span><a href="#static">Static</a><a href="#relative">Relative</a><a href="#absolute">Absolute</a><a href="#fixed">Fixed</a><a href="#sticky">Sticky</a><a href="#lab">Lab</a><button id="th" aria-label="Toggle theme">◐</button></header>
+
+<main>
+<div class="hero"><h1>CSS positioning, shown in a real product UI</h1><p>Each technique below is used the way production teams use it: navbars, badges, sticky table headers and support widgets. Scroll, hover and experiment.</p></div>
+
+<div class="layout">
+<nav class="toc" aria-label="Contents"><h4>Techniques</h4><a href="#static">1 · static</a><a href="#relative">2 · relative</a><a href="#absolute">3 · absolute</a><a href="#fixed">4 · fixed</a><a href="#sticky">5 · sticky</a><a href="#lab">Live lab</a></nav>
+
+<div>
+<section id="static"><h2>Static<span class="tag">position: static</span></h2>
+<p class="lead">The default. Elements follow normal document flow; top/left/z-index have no effect.</p>
+<div class="flow"><div>Order intake panel</div><div>Warehouse allocation panel</div><div>Dispatch panel</div></div>
+<pre>.panel { position: static; /* default */ }</pre>
+<p class="use"><b>Industry use:</b> all regular content, such as articles, forms and dashboards, where layout is handled by flex/grid.</p></section>
+
+<section id="relative"><h2>Relative<span class="tag">position: relative</span></h2>
+<p class="lead">Offset from its normal spot while still reserving its original space. Its main job is to become the anchor for absolute children.</p>
+<div class="cards"><div class="card"><h3>Hover me</h3><p>Nudges up 4px with <code>top</code>.</p></div><div class="card"><h3>Shipment #4821</h3><p>In transit · Chennai → Pune</p></div></div>
+<pre>.card { position: relative; top: 0; }
+.card:hover { top: -4px; }</pre>
+<p class="use"><b>Industry use:</b> positioning contexts for badges and tooltips, and small hover or micro-interaction shifts.</p></section>
+
+<section id="absolute"><h2>Absolute<span class="tag">position: absolute</span></h2>
+<p class="lead">Removed from flow and placed relative to the nearest positioned ancestor.</p>
+<div class="cards"><div class="card"><span class="badge">3 new</span><h3>Inbox</h3><p>Badge pinned top-right.</p><span class="ribbon"></span></div><div class="card"><span class="badge" style="background:var(--ok)">Live</span><h3>Fleet tracking</h3><p>Ribbon pinned to the bottom edge.</p><span class="ribbon" style="background:var(--ok)"></span></div></div>
+<pre>.card  { position: relative; }
+.badge { position: absolute; top: -10px; right: -8px; }
+.ribbon{ position: absolute; bottom: 0; left: 0; right: 0; }</pre>
+<p class="use"><b>Industry use:</b> notification counters, dropdown menus, modals, image captions and overlays.</p></section>
+
+<section id="fixed"><h2>Fixed<span class="tag">position: fixed</span></h2>
+<p class="lead">Positioned relative to the viewport and stays put while scrolling. This page uses it twice: the top navbar and the support button at the bottom right.</p>
+<pre>.nav  { position: fixed; top: 0; left: 0; right: 0; }
+.chat { position: fixed; right: 20px; bottom: 20px; }</pre>
+<p class="use"><b>Industry use:</b> global headers, cookie banners, chat widgets and floating action buttons. Reserve space (padding-top) so content isn’t hidden underneath.</p></section>
+
+<section id="sticky"><h2>Sticky<span class="tag">position: sticky</span></h2>
+<p class="lead">Acts like relative until a scroll threshold is reached, then sticks. Scroll the table below; the header stays visible. The contents sidebar on the left is sticky too.</p>
+<div class="scroller"><table><thead><tr><th>Order</th><th>Route</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div>
+<pre>thead th { position: sticky; top: 0; background: var(--surface); }
+.toc     { position: sticky; top: 80px; }</pre>
+<p class="use"><b>Industry use:</b> data-table headers, section titles in long lists, sidebars and table-of-contents panels.</p></section>
+
+<section id="lab"><h2>Live lab</h2>
+<p class="lead">Choose a position, then scroll inside the frame. The box has <code>top:10px; left:10px</code>.</p>
+<div class="ctrl" role="radiogroup" aria-label="Position value">
+<label><input type="radio" name="p" value="static" checked>static</label><label><input type="radio" name="p" value="relative">relative</label><label><input type="radio" name="p" value="absolute">absolute</label><label><input type="radio" name="p" value="fixed">fixed</label><label><input type="radio" name="p" value="sticky">sticky</label></div>
+<div class="stage"><div class="fill"><p>Scrollable container with filler text.</p><div id="box">I’m the box</div><div id="filler"></div></div></div>
+<pre id="code">#box { position: static; top: 10px; left: 10px; }</pre>
+<p class="use" id="note"></p></section>
+</div></div>
+<footer>Built with plain HTML &amp; CSS · no frameworks</footer>
+</main>
+<button class="chat" onclick="alert('Support chat (fixed to the viewport)')">💬 Support</button>
+
+<script>
+var rows=document.getElementById('rows'),R=['Chennai → Pune','Mumbai → Delhi','Kochi → Goa','Hyderabad → Surat'],S=['Delivered','Delayed','In transit'],h='';
+for(var i=0;i<14;i++){var s=S[i%3];h+='<tr><td>#'+(4800+i)+'</td><td>'+R[i%4]+'</td><td class="'+(s=='Delivered'?'s':s=='Delayed'?'d':'')+'">'+s+'</td></tr>'}
+rows.innerHTML=h;
+var f='';for(var j=0;j<10;j++)f+='<p>Filler line '+(j+1)+' to make the frame scroll.</p>';
+document.getElementById('filler').innerHTML=f;
+var N={static:'Ignores top/left. Stays in normal flow.',relative:'Shifted 10px from its normal spot; original space is kept.',absolute:'Leaves the flow and sits 10px inside the frame (the nearest positioned ancestor). It scrolls with the content.',fixed:'Pinned to the browser viewport, so it jumps out of the frame and ignores its scrolling.',sticky:'Scrolls normally, then sticks 10px from the top of the frame.'};
+function up(v){var b=document.getElementById('box');b.style.position=v;
+document.getElementById('code').textContent='#box { position: '+v+'; top: 10px; left: 10px; }';
+document.getElementById('note').innerHTML='<b>Result:</b> '+N[v]}
+document.querySelectorAll('input[name=p]').forEach(function(e){e.onchange=function(){up(e.value)}});up('static');
+document.getElementById('th').onclick=function(){var r=document.documentElement,d=r.getAttribute('data-theme');
+var dark=d?d=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.setAttribute('data-theme',dark?'light':'dark')};
+</script>
+</body>
+</html>

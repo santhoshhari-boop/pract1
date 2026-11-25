@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Riverside Clinic – Patient registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;700&family=Newsreader:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef4f5;--card:#fff;--ink:#12303a;--mute:#52707a;--line:#c9d9dc;--acc:#0f766e;--acc-ink:#fff;--bad:#b4232a;--ok:#1b7a43;--tint:#e1f0ee;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1b1f;--card:#14272c;--ink:#e3eff1;--mute:#93b0b7;--line:#2c474e;--acc:#3fc1b4;--acc-ink:#07201d;--bad:#ff8a8f;--ok:#6fd49a;--tint:#193a3d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1b1f;--card:#14272c;--ink:#e3eff1;--mute:#93b0b7;--line:#2c474e;--acc:#3fc1b4;--acc-ink:#07201d;--bad:#ff8a8f;--ok:#6fd49a;--tint:#193a3d;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:28px 16px 64px}
+h1,h2{font-family:Newsreader,Georgia,serif;font-weight:600;margin:0}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.1}
+.lead{color:var(--mute);margin:8px 0 20px;max-width:56ch}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0}
+.track{height:8px;background:var(--line);border-radius:8px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.bar small{color:var(--mute)}
+fieldset{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 18px;min-width:0}
+legend{font-family:Newsreader,Georgia,serif;font-size:21px;font-weight:600;padding:0 8px;margin-left:-8px}
+.grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+.full{grid-column:1/-1}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:5px;min-width:0}
+label,.lab{font-weight:500;font-size:15px}
+.req::after{content:" *";color:var(--bad)}
+.hint{font-size:13px;color:var(--mute)}
+input:not([type=radio]):not([type=checkbox]),select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
+textarea{resize:vertical;min-height:96px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.opt input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.touched:invalid,.f.bad input,.f.bad select,.f.bad textarea{border-color:var(--bad)}
+.touched:valid{border-color:var(--ok)}
+.err{color:var(--bad);font-size:13px;min-height:0}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;background:var(--bg)}
+.opt:has(input:checked){border-color:var(--acc);background:var(--tint)}
+.opt input{accent-color:var(--acc);width:18px;height:18px;margin:0}
+.pw{position:relative}.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:4px 10px;font-size:13px}
+.meter{display:flex;gap:4px;margin-top:4px}.meter span{flex:1;height:5px;border-radius:4px;background:var(--line)}
+.meter[data-s="1"] span:nth-child(-n+1){background:var(--bad)}
+.meter[data-s="2"] span:nth-child(-n+2){background:#d98c1f}
+.meter[data-s="3"] span:nth-child(-n+3){background:#7aa82e}
+.meter[data-s="4"] span{background:var(--ok)}
+.count{text-align:right}
+.hidden{display:none!important}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:10px 18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.primary{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:700}
+#files{list-style:none;margin:6px 0 0;padding:0;font-size:14px}
+#result{background:var(--tint);border:1.5px solid var(--acc);border-radius:14px;padding:20px;margin-top:18px}
+#result dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 16px;margin:12px 0 0}
+#result dt{color:var(--mute)}#result dd{margin:0;word-break:break-word}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.mark{width:64px;height:64px;flex:none;color:var(--acc)}
+.mark *{fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s cubic-bezier(.6,0,.2,1) forwards}
+.mark .w{animation-delay:.5s}.mark .c{animation-delay:.3s}
+.word{font-family:Newsreader,Georgia,serif;font-size:30px;font-weight:600;line-height:1;opacity:0;animation:rise .6s .9s ease forwards}
+.word small{display:block;font:500 14px Figtree,system-ui,sans-serif;color:var(--mute);margin-top:6px;letter-spacing:.02em}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes rise{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.mark *{animation:none;stroke-dashoffset:0}.word{animation:none;opacity:1}}
+</style>
+</head>
+<body>
+<main>
+<header class="brand">
+<svg class="mark" viewBox="0 0 56 56" role="img" aria-label="Riverside Clinic logo">
+<circle cx="28" cy="28" r="25" pathLength="1"/>
+<path class="c" pathLength="1" d="M28 12v18M19 21h18"/>
+<path class="w" pathLength="1" d="M10 38c4.5-5 9-5 13.5 0s9 5 13.5 0 6-2.5 9-2"/>
+</svg>
+<div class="word">Riverside<small>Clinic</small></div>
+</header>
+<h1>Patient registration</h1>
+<p class="lead">Tell us about yourself so the care team can prepare for your visit. Fields marked * are required.</p>
+<div class="bar" aria-live="polite"><div class="track"><i id="prog"></i></div><small id="progTxt">0% complete</small></div>
+
+<form id="form" novalidate autocomplete="on">
+
+<fieldset>
+<legend>Your account</legend>
+<div class="grid">
+<div class="f full"><label class="req" for="name">Full name</label>
+<input id="name" name="name" type="text" required minlength="3" maxlength="60" pattern="[A-Za-z][A-Za-z .'\-]{2,}" autocomplete="name" placeholder="Priya Raman">
+<span class="hint">Letters, spaces, hyphens and apostrophes only.</span><span class="err"></span></div>
+
+<div class="f"><label class="req" for="email">Email</label>
+<input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"><span class="err"></span></div>
+
+<div class="f"><label class="req" for="phone">Mobile number</label>
+<input id="phone" name="phone" type="tel" required pattern="[6-9][0-9]{9}" inputmode="numeric" maxlength="10" placeholder="9876543210">
+<span class="hint">10 digits, starting with 6–9.</span><span class="err"></span></div>
+
+<div class="f"><label class="req" for="pw">Password</label>
+<div class="pw"><input id="pw" name="pw" type="password" required minlength="8" maxlength="64" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}" autocomplete="new-password"><button type="button" id="toggle" aria-pressed="false">Show</button></div>
+<div class="meter" id="meter" data-s="0" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+<span class="hint" id="pwHint">8+ characters with upper and lower case, a number and a symbol.</span><span class="err"></span></div>
+
+<div class="f"><label class="req" for="pw2">Confirm password</label>
+<input id="pw2" name="pw2" type="password" required autocomplete="new-password"><span class="err"></span></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>About you</legend>
+<div class="grid">
+<div class="f"><label class="req" for="dob">Date of birth</label>
+<input id="dob" name="dob" type="date" required min="1900-01-01"><span class="hint" id="age"></span><span class="err"></span></div>
+
+<div class="f"><span class="lab req" id="gl">Gender</span>
+<div class="opts" role="radiogroup" aria-labelledby="gl">
+<label class="opt"><input type="radio" name="gender" value="Female" required>Female</label>
+<label class="opt"><input type="radio" name="gender" value="Male">Male</label>
+<label class="opt"><input type="radio" name="gender" value="Other / prefer not to say">Other</label></div><span class="err"></span></div>
+
+<div class="f"><label for="height">Height (cm)</label>
+<input id="height" name="height" type="number" min="40" max="250" step="0.5" placeholder="165"><span class="err"></span></div>
+
+<div class="f"><label for="weight">Weight (kg)</label>
+<input id="weight" name="weight" type="number" min="2" max="300" step="0.1" placeholder="62"><span class="hint" id="bmi"></span><span class="err"></span></div>
+
+<div class="f"><label for="blood">Blood group</label>
+<select id="blood" name="blood"><option value="">Not sure</option>
+<option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option></select></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Health history</legend>
+<div class="grid">
+<div class="f full"><span class="lab">Existing conditions</span>
+<div class="opts">
+<label class="opt"><input type="checkbox" name="cond" value="Diabetes">Diabetes</label>
+<label class="opt"><input type="checkbox" name="cond" value="Hypertension">Hypertension</label>
+<label class="opt"><input type="checkbox" name="cond" value="Asthma">Asthma</label>
+<label class="opt"><input type="checkbox" name="cond" value="Heart disease">Heart disease</label>
+<label class="opt"><input type="checkbox" name="cond" value="Allergies" id="allergyChk">Allergies</label></div></div>
+
+<div class="f full hidden" id="allergyBox"><label class="req" for="allergy">Which allergies?</label>
+<input id="allergy" name="allergy" type="text" maxlength="120" placeholder="e.g. penicillin, peanuts"><span class="err"></span></div>
+
+<div class="f full"><label class="req" for="reason">Reason for visit</label>
+<textarea id="reason" name="reason" required minlength="15" maxlength="400" placeholder="Describe your symptoms and how long you have had them."></textarea>
+<span class="hint count"><span id="cnt">0</span>/400</span><span class="err"></span></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Appointment</legend>
+<div class="grid">
+<div class="f"><label class="req" for="dept">Department</label>
+<select id="dept" name="dept" required><option value="">Choose a department</option>
+<option>General medicine</option><option>Pediatrics</option><option>Cardiology</option><option>Dermatology</option><option>Orthopedics</option></select><span class="err"></span></div>
+
+<div class="f"><label class="req" for="date">Preferred date</label>
+<input id="date" name="date" type="date" required><span class="hint">Weekdays only, within the next 60 days.</span><span class="err"></span></div>
+
+<div class="f"><label class="req" for="time">Preferred time</label>
+<input id="time" name="time" type="time" required min="09:00" max="17:00" step="900"><span class="hint">Clinic hours 9:00–17:00.</span><span class="err"></span></div>
+
+<div class="f"><span class="lab req" id="il">Do you have health insurance?</span>
+<div class="opts" role="radiogroup" aria-labelledby="il">
+<label class="opt"><input type="radio" name="ins" value="Yes" required>Yes</label>
+<label class="opt"><input type="radio" name="ins" value="No">No</label></div><span class="err"></span></div>
+
+<div class="f full hidden" id="insBox"><label class="req" for="policy">Policy number</label>
+<input id="policy" name="policy" type="text" pattern="[A-Z]{2}[0-9]{8}" maxlength="10" placeholder="AB12345678"><span class="hint">Two capital letters followed by 8 digits.</span><span class="err"></span></div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Documents and consent</legend>
+<div class="f"><label for="docs">Previous reports or ID (optional)</label>
+<input id="docs" name="docs" type="file" multiple accept=".pdf,.jpg,.jpeg,.png">
+<span class="hint">PDF, JPG or PNG. Up to 3 files, 2 MB each.</span><ul id="files"></ul><span class="err"></span></div>
+<div class="f" style="margin-top:14px"><label class="opt" style="align-items:flex-start"><input type="checkbox" id="consent" name="consent" required style="margin-top:3px">
+<span>I confirm the details are correct and agree to the clinic using them to arrange my care.</span></label><span class="err"></span></div>
+</fieldset>
+
+<div class="row"><button type="submit" class="primary">Register patient</button><button type="reset">Clear form</button></div>
+</form>
+
+<section id="result" class="hidden" tabindex="-1" aria-live="polite"></section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s), form=$('#form');
+const fields=[...form.elements].filter(e=>e.name&&e.type!=='button'&&e.type!=='submit'&&e.type!=='reset');
+const wrapOf=e=>e.closest('.f');
+const msgs={
+ name:{patternMismatch:'Use letters, spaces, hyphens or apostrophes only.',tooShort:'Enter at least 3 characters.'},
+ email:{typeMismatch:'Enter an address like name@example.com.'},
+ phone:{patternMismatch:'Enter a 10-digit number starting with 6, 7, 8 or 9.'},
+ pw:{patternMismatch:'Add upper and lower case letters, a number and a symbol.',tooShort:'Use at least 8 characters.'},
+ policy:{patternMismatch:'Format: two capital letters then 8 digits.'},
+ reason:{tooShort:'Please give at least 15 characters so we can triage.'},
+ consent:{valueMissing:'You need to agree before registering.'}
+};
+function msg(e){
+ const v=e.validity; if(v.valid) return '';
+ const c=(msgs[e.name]||{});
+ for(const k in c) if(v[k]) return c[k];
+ if(v.valueMissing) return e.type==='radio'?'Choose one option.':e.tagName==='SELECT'?'Pick an option from the list.':'This field is required.';
+ return e.validationMessage;
+}
+function show(e){
+ const w=wrapOf(e); if(!w) return;
+ const m=msg(e), out=w.querySelector('.err');
+ e.classList.add('touched'); w.classList.toggle('bad',!!m);
+ if(out){out.textContent=m; out.id=out.id||e.id+'-e'||'';}
+ e.setAttribute('aria-invalid',m?'true':'false');
+}
+function custom(){
+ // password match
+ $('#pw2').setCustomValidity($('#pw2').value&&$('#pw2').value!==$('#pw').value?'Passwords do not match.':'');
+ // date of birth: not future
+ const dob=$('#dob'),today=new Date(),iso=d=>d.toISOString().slice(0,10);
+ dob.max=iso(today);
+ dob.setCustomValidity(dob.value&&dob.value>dob.max?'Date of birth cannot be in the future.':'');
+ // appointment: weekday, tomorrow..60 days
+ const ap=$('#date'),lo=new Date(today.getTime()+864e5),hi=new Date(today.getTime()+60*864e5);
+ ap.min=iso(lo);ap.max=iso(hi);
+ const wd=ap.value?new Date(ap.value+'T00:00').getDay():1;
+ ap.setCustomValidity(ap.value&&(wd===0||wd===6)?'The clinic is closed at weekends. Pick a weekday.':'');
+ // conditional requirements
+ const al=$('#allergyChk').checked; $('#allergyBox').classList.toggle('hidden',!al); $('#allergy').required=al;
+ const ins=form.ins.value==='Yes'; $('#insBox').classList.toggle('hidden',!ins); $('#policy').required=ins;
+ // files
+ const fl=[...$('#docs').files]; let fm='';
+ if(fl.length>3) fm='Attach at most 3 files.';
+ else if(fl.some(f=>f.size>2*1024*1024)) fm='Each file must be under 2 MB.';
+ else if(fl.some(f=>!/\.(pdf|jpe?g|png)$/i.test(f.name))) fm='Only PDF, JPG or PNG files are allowed.';
+ $('#docs').setCustomValidity(fm);
+ $('#files').innerHTML=fl.map(f=>`<li>${f.name.replace(/[<>&]/g,'')} (${Math.ceil(f.size/1024)} KB)</li>`).join('');
+ // age + BMI helpers
+ if(dob.value&&!dob.validationMessage){const b=new Date(dob.value),a=Math.floor((today-b)/31557600000);$('#age').textContent=a>=0?`Age: ${a}`:'';}else $('#age').textContent='';
+ const h=+$('#height').value,w=+$('#weight').value;
+ $('#bmi').textContent=h&&w?`BMI ≈ ${(w/((h/100)**2)).toFixed(1)}`:'';
+}
+function strength(p){let s=0;if(p.length>=8)s++;if(/[a-z]/.test(p)&&/[A-Z]/.test(p))s++;if(/\d/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;return p?Math.max(s,1):0}
+function progress(){
+ const req=fields.filter(e=>e.required&&!e.closest('.hidden'));
+ const seen=new Set(),done=[];
+ req.forEach(e=>{const k=e.type==='radio'?e.name:e.id;if(seen.has(k))return;seen.add(k);
+  const ok=e.type==='radio'?!!form[e.name].value:e.validity.valid&&(e.type==='checkbox'?e.checked:true);done.push(ok)});
+ const pct=Math.round(done.filter(Boolean).length/done.length*100);
+ $('#prog').style.width=pct+'%';$('#progTxt').textContent=pct+'% complete';
+}
+form.addEventListener('input',e=>{
+ custom(); if(e.target.id==='pw'){$('#meter').dataset.s=strength(e.target.value);if($('#pw2').value)show($('#pw2'));}
+ if(e.target.id==='reason')$('#cnt').textContent=e.target.value.length;
+ if(e.target.classList.contains('touched')||e.target.type==='radio'||e.target.type==='checkbox'||e.target.type==='file')show(e.target);
+ progress();
+});
+form.addEventListener('focusout',e=>{if(fields.includes(e.target))show(e.target)});
+form.addEventListener('change',e=>{if(e.target.name==='ins'||e.target.name==='cond'){custom();progress()}});
+$('#toggle').addEventListener('click',e=>{const b=e.currentTarget,p=$('#pw'),on=p.type==='password';p.type=on?'text':'password';b.textContent=on?'Hide':'Show';b.setAttribute('aria-pressed',on)});
+form.addEventListener('submit',e=>{
+ e.preventDefault();custom();
+ if(!form.checkValidity()){
+  fields.forEach(show);
+  const first=fields.find(f=>!f.validity.valid);first&&first.focus();return;
+ }
+ const d=new FormData(form),g=k=>d.get(k)||'—',conds=d.getAll('cond');
+ const rows=[['Name',g('name')],['Email',g('email')],['Mobile',g('phone')],['Date of birth',g('dob')],['Gender',g('gender')],
+ ['Conditions',(conds.join(', ')||'None')+(d.get('allergy')?` (${d.get('allergy')})`:'')],['Reason',g('reason')],
+ ['Appointment',`${g('dept')}, ${g('date')} at ${g('time')}`],['Insurance',d.get('ins')==='Yes'?'Policy '+g('policy'):'None'],
+ ['Documents',[...$('#docs').files].map(f=>f.name).join(', ')||'None']];
+ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const r=$('#result');
+ r.innerHTML=`<h2>Registration received</h2><p class="hint">Check the details below. The password is never shown or stored.</p><dl>${rows.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join('')}</dl>`;
+ r.classList.remove('hidden');r.focus();r.scrollIntoView({behavior:'smooth',block:'start'});
+});
+form.addEventListener('reset',()=>{
+ setTimeout(()=>{fields.forEach(f=>{f.classList.remove('touched');f.removeAttribute('aria-invalid');f.setCustomValidity('')});
+ form.querySelectorAll('.err').forEach(x=>x.textContent='');form.querySelectorAll('.bad').forEach(x=>x.classList.remove('bad'));
+ $('#meter').dataset.s=0;$('#cnt').textContent=0;$('#result').classList.add('hidden');custom();progress()});
+});
+custom();progress();
+</script>
+</body>
+</html>

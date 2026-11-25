@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voltara · Renewable Energy Gallery</title>
+<style>
+:root{--bg:#f4f7f3;--surface:#fff;--text:#16241d;--muted:#58675f;--accent:#0f8a5f;--accent2:#f2a900;--line:#dbe4dd;--sky1:#cfeee6;--sky2:#f7fbf2;--ground:#2f7d5b;--ink:#16241d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d1612;--surface:#15231c;--text:#e8f1ec;--muted:#9fb3a8;--accent:#3ddc97;--accent2:#ffc83d;--line:#25382e;--sky1:#17352c;--sky2:#0f1f19;--ground:#1f5a43;--ink:#e8f1ec}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d1612;--surface:#15231c;--text:#e8f1ec;--muted:#9fb3a8;--accent:#3ddc97;--accent2:#ffc83d;--line:#25382e;--sky1:#17352c;--sky2:#0f1f19;--ground:#1f5a43;--ink:#e8f1ec}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;line-height:1.5}
+/* Entrance logo */
+#splash{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);cursor:pointer;transition:opacity .7s ease,transform .9s cubic-bezier(.7,0,.2,1)}
+#splash.out{opacity:0;transform:translateY(-100%);pointer-events:none}
+.logo{display:flex;flex-direction:column;align-items:center;gap:18px}
+.logo svg{width:120px;height:120px;overflow:visible}
+.ring{fill:none;stroke:var(--accent);stroke-width:5;stroke-dasharray:300;stroke-dashoffset:300;animation:draw 1.2s .1s ease forwards}
+.bolt{fill:var(--accent2);opacity:0;transform-origin:center;animation:pop .6s 1s ease forwards}
+.word{font-size:2rem;font-weight:700;letter-spacing:.35em;padding-left:.35em;opacity:0;animation:rise .7s 1.2s ease forwards}
+.tag{color:var(--muted);font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:rise .7s 1.5s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+/* Page */
+header{max-width:1200px;margin:0 auto;padding:48px 20px 16px}
+header h1{font-size:clamp(1.8rem,5vw,3rem);margin:0 0 8px;line-height:1.1}
+header p{margin:0;color:var(--muted);max-width:60ch}
+.chips{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;flex-wrap:wrap;gap:8px}
+.chips button{font:inherit;font-size:.9rem;padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Grid */
+.gallery{max-width:1200px;margin:0 auto;padding:12px 20px 56px;display:grid;gap:20px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
+figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s}
+figure:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.14)}
+figure[hidden]{display:none}
+.img{aspect-ratio:4/3;width:100%;display:block;overflow:hidden;background:var(--sky1)}
+.img svg{width:100%;height:100%;display:block}
+figcaption{padding:14px 16px 18px}
+figcaption b{display:block;font-size:1.02rem;margin-bottom:2px}
+figcaption span{color:var(--muted);font-size:.9rem}
+.k{display:inline-block;margin-top:10px;font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:0 20px 40px}
+/* Scene colors */
+.sky{fill:url(#sky)}.gr{fill:var(--ground)}.ink{fill:var(--ink)}.ac{fill:var(--accent)}.am{fill:var(--accent2)}.wh{fill:#fff}
+@media (prefers-reduced-motion:reduce){#splash{transition:none}.ring,.bolt,.word,.tag{animation:none;opacity:1;stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div id="splash" role="presentation" title="Click to skip">
+  <div class="logo">
+    <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring" cx="60" cy="60" r="48"/><path class="bolt" d="M66 22 40 66h18l-6 32 28-46H62z"/></svg>
+    <div class="word">VOLTARA</div>
+    <div class="tag">Power the next century</div>
+  </div>
+</div>
+
+<header>
+  <h1>Clean energy, in the field.</h1>
+  <p>A look at the six systems Voltara builds and operates, from generation to storage to the last mile.</p>
+</header>
+
+<div class="chips" role="group" aria-label="Filter gallery">
+  <button aria-pressed="true" data-f="all">All</button>
+  <button aria-pressed="false" data-f="generation">Generation</button>
+  <button aria-pressed="false" data-f="storage">Storage</button>
+  <button aria-pressed="false" data-f="delivery">Delivery</button>
+</div>
+
+<main class="gallery">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--sky1)"/><stop offset="1" stop-color="var(--sky2)"/></linearGradient></defs></svg>
+
+<figure data-cat="generation"><div class="img"><svg viewBox="0 0 400 300" role="img" aria-label="Rows of solar panels under a bright sun"><rect class="sky" width="400" height="300"/><circle class="am" cx="320" cy="60" r="30"/><rect class="gr" y="190" width="400" height="110"/><g class="ac"><path d="M30 250 70 200h90l-40 50z"/><path d="M150 250 190 200h90l-40 50z"/><path d="M270 250 310 200h90l-40 50z"/></g><path class="wh" opacity=".35" d="M90 200 50 250M110 200 70 250M200 200 160 250M220 200 180 250M320 200 280 250M340 200 300 250"/></svg></div><figcaption><b>Mesa Solar Array</b><span>240 MW of single-axis tracking panels powering about 60,000 homes.</span><br><span class="k">Generation</span></figcaption></figure>
+
+<figure data-cat="generation"><div class="img"><svg viewBox="0 0 400 300" role="img" aria-label="Three wind turbines on rolling hills"><rect class="sky" width="400" height="300"/><path class="gr" d="M0 240q100-60 200-20t200-30v110H0z"/><g class="ink"><path d="M95 230 99 110h4l4 120zM205 235 209 90h4l4 145zM315 230 319 120h3l4 110z"/></g><g stroke="var(--ink)" stroke-width="5" stroke-linecap="round"><path d="M101 108v-50M101 108l42 26M101 108l-42 26M211 88V28M211 88l42 26M211 88l-42 26M320 118v-40M320 118l34 20M320 118l-34 20"/></g></svg></div><figcaption><b>Ridgeline Wind Farm</b><span>Low-noise turbines sited to share land with working pasture.</span><br><span class="k">Generation</span></figcaption></figure>
+
+<figure data-cat="generation"><div class="img"><svg viewBox="0 0 400 300" role="img" aria-label="A hydroelectric dam releasing water"><rect class="sky" width="400" height="300"/><path class="gr" d="M0 120l120 30v150H0z"/><path class="ink" d="M120 110h170l20 190H100z" opacity=".85"/><path class="ac" opacity=".85" d="M0 200h120v100H0z"/><path class="wh" opacity=".8" d="M150 200h24v100h-24zM200 200h24v100h-24zM250 200h24v100h-24z"/><path class="ac" d="M120 300h280v-60q-70 20-140 0t-140-10z" opacity=".6"/></svg></div><figcaption><b>Cedar Run Hydro</b><span>Fish-friendly turbines delivering steady baseload around the clock.</span><br><span class="k">Generation</span></figcaption></figure>
+
+<figure data-cat="storage"><div class="img"><svg viewBox="0 0 400 300" role="img" aria-label="A row of grid battery containers"><rect class="sky" width="400" height="300"/><rect class="gr" y="210" width="400" height="90"/><g class="ink"><rect x="30" y="140" width="100" height="80" rx="6"/><rect x="150" y="140" width="100" height="80" rx="6"/><rect x="270" y="140" width="100" height="80" rx="6"/></g><g class="ac"><rect x="42" y="156" width="76" height="10"/><rect x="162" y="156" width="76" height="10"/><rect x="282" y="156" width="76" height="10"/></g><g class="am"><rect x="42" y="176" width="50" height="10"/><rect x="162" y="176" width="64" height="10"/><rect x="282" y="176" width="32" height="10"/></g></svg></div><figcaption><b>Harbor Battery Park</b><span>400 MWh of lithium storage that shifts midday sun into the evening peak.</span><br><span class="k">Storage</span></figcaption></figure>
+
+<figure data-cat="delivery"><div class="img"><svg viewBox="0 0 400 300" role="img" aria-label="High-voltage pylons carrying power lines across a field"><rect class="sky" width="400" height="300"/><rect class="gr" y="230" width="400" height="70"/><g stroke="var(--ink)" stroke-width="4" fill="none"><path d="M110 230 130 70 150 230M118 120h24M114 170h32M130 70 100 90h60z"/><path d="M270 230 290 70 310 230M278 120h24M274 170h32M290 70 260 90h60z"/><path d="M0 130q55 30 110-10t180 0 110 10M0 150q55 30 110-10t180 0 110 10" stroke-width="2"/></g></svg></div><figcaption><b>Northern Interconnect</b><span>A 320 km high-voltage link moving surplus power between regions.</span><br><span class="k">Delivery</span></figcaption></figure>
+
+<figure data-cat="delivery"><div class="img"><svg viewBox="0 0 400 300" role="img" aria-label="Electric vehicle plugged in at a charging station"><rect class="sky" width="400" height="300"/><rect class="gr" y="220" width="400" height="80"/><path class="ac" d="M160 220v-40h60v40z"/><rect class="ink" x="170" y="190" width="40" height="14" rx="3"/><path class="am" d="M196 194l-8 14h8l-3 10 12-16h-9z"/><path class="ink" d="M230 230q0-50 30-60h50q40 5 60 40v20H230z"/><circle class="wh" cx="270" cy="250" r="16"/><circle class="wh" cx="350" cy="250" r="16"/><path stroke="var(--ink)" stroke-width="4" fill="none" d="M215 200q10 20 30 12"/></svg></div><figcaption><b>Metro Fast Charging</b><span>Solar-backed charging hubs adding 200 km of range in ten minutes.</span><br><span class="k">Delivery</span></figcaption></figure>
+</main>
+
+<footer>© 2026 Voltara Energy · Illustrative scenes</footer>
+
+<script>
+(function(){
+  var s=document.getElementById('splash');
+  function hide(){s.classList.add('out');setTimeout(function(){s.remove()},1000)}
+  s.addEventListener('click',hide);
+  setTimeout(hide,matchMedia('(prefers-reduced-motion:reduce)').matches?600:2600);
+  var btns=document.querySelectorAll('.chips button'),figs=document.querySelectorAll('figure');
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    btns.forEach(function(x){x.setAttribute('aria-pressed',x===b)});
+    figs.forEach(function(f){f.hidden=b.dataset.f!=='all'&&f.dataset.cat!==b.dataset.f});
+  })});
+})();
+</script>
+</body>
+</html>

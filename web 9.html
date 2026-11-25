@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AgriNova 2030 – Smart Farming</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef6f1;--surface:#ffffff;--text:#0b1f17;--muted:#4b6559;--accent:#0a9f6e;--accent2:#6a5cff;--line:#cfe3d8;--glow:rgba(10,159,110,.25)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#060d0b;--surface:#0e1a16;--text:#e6fff4;--muted:#8fb3a3;--accent:#2cffb0;--accent2:#8b7bff;--line:#1c3329;--glow:rgba(44,255,176,.3)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#060d0b;--surface:#0e1a16;--text:#e6fff4;--muted:#8fb3a3;--accent:#2cffb0;--accent2:#8b7bff;--line:#1c3329;--glow:rgba(44,255,176,.3)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,sans-serif;overflow-x:hidden}
+.orb{position:fixed;border-radius:50%;filter:blur(70px);opacity:.5;z-index:0;pointer-events:none;animation:drift 14s ease-in-out infinite alternate}
+.o1{width:340px;height:340px;background:var(--accent);top:-80px;left:-80px}
+.o2{width:300px;height:300px;background:var(--accent2);bottom:-60px;right:-60px;animation-delay:-6s}
+@keyframes drift{to{transform:translate(70px,50px) scale(1.2)}}
+.wrap{position:relative;z-index:1;max-width:1000px;margin:auto;padding:20px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:8px 0;animation:fadeDown .8s both}
+.logo{font-weight:800;letter-spacing:.5px;font-size:1.2rem}.logo span{color:var(--accent)}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-24px)}}
+@keyframes rise{from{opacity:0;transform:translateY(30px)}}
+.btn{border:1px solid var(--accent);background:transparent;color:var(--accent);padding:10px 18px;border-radius:999px;font-weight:600;cursor:pointer;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s,background .25s,color .25s}
+.btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 8px 24px var(--glow);background:var(--accent);color:var(--bg)}
+.btn:active{transform:scale(.95)}
+.btn.solid{background:var(--accent);color:var(--bg)}
+.btn.solid:hover{background:transparent;color:var(--accent)}
+.hero{text-align:center;padding:50px 0 30px;animation:rise 1s .2s both}
+.hero h1{font-size:clamp(2rem,6vw,3.6rem);margin:12px 0;line-height:1.1}
+.grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4s linear infinite}
+@keyframes shine{to{background-position:200% 0}}
+.hero p{color:var(--muted);max-width:560px;margin:0 auto 22px}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:6px 14px;border:1px solid var(--line);border-radius:999px;font-size:.8rem;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--glow)}100%{box-shadow:0 0 0 12px transparent}}
+.drone{width:120px;height:120px;margin:10px auto;display:block;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-16px) rotate(4deg)}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:20px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:center;animation:rise .8s both;transition:transform .3s,box-shadow .3s}
+.stat:nth-child(2){animation-delay:.15s}.stat:nth-child(3){animation-delay:.3s}.stat:nth-child(4){animation-delay:.45s}
+.stat:hover{transform:translateY(-6px);box-shadow:0 12px 30px var(--glow)}
+.stat b{display:block;font-size:1.8rem;color:var(--accent)}
+.stat span{color:var(--muted);font-size:.85rem}
+h2{margin:36px 0 14px}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tab.active{background:var(--accent);color:var(--bg)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;perspective:900px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;opacity:0;transform:translateY(40px) rotateX(-12deg) scale(.95);transition:opacity .6s,transform .6s cubic-bezier(.2,.9,.3,1.2),box-shadow .3s;display:none}
+.card.show{display:block}
+.card.in{opacity:1;transform:none}
+.card:hover{box-shadow:0 14px 34px var(--glow);transform:translateY(-8px) scale(1.02)}
+.card .ico{font-size:2rem;display:inline-block;transition:transform .5s}
+.card:hover .ico{transform:rotate(360deg) scale(1.2)}
+.card p{color:var(--muted);font-size:.9rem}
+.bar{height:8px;border-radius:8px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1.4s ease}
+.card.in .bar i{width:var(--w)}
+.acc{background:var(--surface);border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden}
+.acc-h{width:100%;text-align:left;background:none;border:0;color:var(--text);padding:16px;font-size:1rem;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .3s}
+.acc-h:hover{background:var(--line)}
+.arrow{transition:transform .4s}
+.acc.open .arrow{transform:rotate(180deg)}
+.acc-b{max-height:0;opacity:0;padding:0 16px;transition:max-height .5s ease,opacity .5s,padding .5s;color:var(--muted)}
+.acc.open .acc-b{max-height:200px;opacity:1;padding:0 16px 16px}
+.panel{background:var(--surface);border:1px solid var(--accent);border-radius:20px;padding:20px;margin-top:14px;display:none;box-shadow:0 0 40px var(--glow)}
+.panel.on{display:block;animation:pop .5s cubic-bezier(.2,.9,.3,1.3)}
+.panel.out{animation:popOut .4s forwards}
+@keyframes pop{from{opacity:0;transform:scale(.8) translateY(30px)}}
+@keyframes popOut{to{opacity:0;transform:scale(.8) translateY(30px)}}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:12px}
+.field{height:80px;border-radius:14px;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:transform .3s,background .3s;position:relative}
+.field:hover{transform:scale(1.07)}
+.field.wet{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff}
+.field.wet::after{content:"💧";position:absolute;top:-8px;right:-4px;animation:drip 1s infinite}
+@keyframes drip{50%{transform:translateY(8px);opacity:.4}}
+#toasts{position:fixed;right:16px;top:calc(env(safe-area-inset-top,0px) + 16px);z-index:20;display:flex;flex-direction:column;gap:10px;max-width:calc(100vw - 32px)}
+.toast{background:var(--surface);border:1px solid var(--accent);border-left:5px solid var(--accent);padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px var(--glow);animation:slideIn .5s cubic-bezier(.2,.9,.3,1.3)}
+.toast.bye{animation:slideOut .4s forwards}
+@keyframes slideIn{from{opacity:0;transform:translateX(120%)}}
+@keyframes slideOut{to{opacity:0;transform:translateX(120%)}}
+.bell{position:relative}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--accent2);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.7rem;display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.badge.bump{animation:bump .5s}
+@keyframes bump{50%{transform:scale(1.7)}}
+footer{text-align:center;color:var(--muted);padding:40px 0 20px;font-size:.85rem}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div id="toasts"></div>
+<div class="wrap">
+<nav>
+  <div class="logo">Agri<span>Nova</span> 2030</div>
+  <div>
+    <button class="btn bell" id="bell">🔔<span class="badge" id="badge">0</span></button>
+    <button class="btn" id="theme">◐</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <span class="pill"><span class="dot"></span> AI swarm online · 2,481 sensors live</span>
+  <img class="drone" alt="Farm drone" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='16' fill='%232cffb0'/%3E%3Cg stroke='%238b7bff' stroke-width='5' stroke-linecap='round'%3E%3Cpath d='M20 30h30M70 30h30M20 90h30M70 90h30M46 52L30 36M74 52l16-16M46 68L30 84M74 68l16 16'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='6' fill='%23060d0b'/%3E%3C/svg%3E">
+  <h1>Farming that <span class="grad">thinks for itself</span></h1>
+  <p>Autonomous drones, soil intelligence and predictive crop AI working together, so every field grows smarter each day.</p>
+  <button class="btn solid" id="deploy">🚀 Deploy Drone Swarm</button>
+  <button class="btn" id="openPanel">🗺️ Open Field Control</button>
+</section>
+
+<section class="stats">
+  <div class="stat"><b>+42%</b><span>Yield boost</span></div>
+  <div class="stat"><b>-61%</b><span>Water used</span></div>
+  <div class="stat"><b>98.7%</b><span>Pest detection</span></div>
+  <div class="stat"><b>24/7</b><span>Autonomous ops</span></div>
+</section>
+
+<section class="panel" id="panel">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <strong>Field Control · tap a plot to irrigate</strong>
+    <button class="btn" id="closePanel">✕ Close</button>
+  </div>
+  <div class="fields" id="fields"></div>
+</section>
+
+<section>
+  <h2>Intelligence Modules</h2>
+  <div class="tabs">
+    <button class="btn tab active" data-f="all">All</button>
+    <button class="btn tab" data-f="soil">Soil</button>
+    <button class="btn tab" data-f="air">Air &amp; Sky</button>
+    <button class="btn tab" data-f="ai">AI</button>
+  </div>
+  <div class="cards" id="cards">
+    <div class="card" data-c="soil"><span class="ico">🌱</span><h3>Soil Nano-Sensors</h3><p>Reads moisture, nitrogen and pH every 30 seconds.</p><div class="bar"><i style="--w:92%"></i></div></div>
+    <div class="card" data-c="air"><span class="ico">🛸</span><h3>Drone Swarm</h3><p>Self-coordinating drones scan and treat 500 acres per hour.</p><div class="bar"><i style="--w:85%"></i></div></div>
+    <div class="card" data-c="ai"><span class="ico">🧠</span><h3>Crop Oracle AI</h3><p>Forecasts harvest and disease risk 90 days ahead.</p><div class="bar"><i style="--w:96%"></i></div></div>
+    <div class="card" data-c="soil"><span class="ico">💧</span><h3>Precision Irrigation</h3><p>Waters only where roots need it, cutting waste dramatically.</p><div class="bar"><i style="--w:78%"></i></div></div>
+    <div class="card" data-c="air"><span class="ico">🛰️</span><h3>Satellite Link</h3><p>Weather and crop-health imagery streamed in real time.</p><div class="bar"><i style="--w:88%"></i></div></div>
+    <div class="card" data-c="ai"><span class="ico">🤖</span><h3>Harvest Bots</h3><p>Robotic pickers that judge ripeness by colour and scent.</p><div class="bar"><i style="--w:81%"></i></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>How It Works</h2>
+  <div class="acc"><button class="acc-h">1 · Sense <span class="arrow">▼</span></button><div class="acc-b">Thousands of sensors capture soil, leaf and climate data continuously.</div></div>
+  <div class="acc"><button class="acc-h">2 · Decide <span class="arrow">▼</span></button><div class="acc-b">Crop Oracle AI models every plot and schedules the best action.</div></div>
+  <div class="acc"><button class="acc-h">3 · Act <span class="arrow">▼</span></button><div class="acc-b">Drones, valves and robots execute tasks automatically, with you in control.</div></div>
+</section>
+
+<footer>© 2030 AgriNova · Growing the future</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+let count=0;
+function toast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  $('#toasts').appendChild(t);
+  count++;$('#badge').textContent=count;
+  $('#badge').classList.remove('bump');void $('#badge').offsetWidth;$('#badge').classList.add('bump');
+  setTimeout(()=>t.classList.add('bye'),3200);
+  setTimeout(()=>t.remove(),3700);
+}
+// Cards reveal
+function showCards(f){
+  $$('.card').forEach(c=>{
+    c.classList.remove('in','show');
+    if(f==='all'||c.dataset.c===f)c.classList.add('show');
+  });
+  let d=0;
+  $$('.card.show').forEach(c=>{setTimeout(()=>c.classList.add('in'),80+d);d+=120});
+}
+showCards('all');
+$$('.tab').forEach(b=>b.addEventListener('click',()=>{
+  $$('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');showCards(b.dataset.f);
+}));
+// Accordion
+$$('.acc-h').forEach(h=>h.addEventListener('click',()=>{
+  const a=h.parentElement,was=a.classList.contains('open');
+  $$('.acc').forEach(x=>x.classList.remove('open'));
+  if(!was)a.classList.add('open');
+}));
+// Field panel
+const panel=$('#panel'),fields=$('#fields');
+['A1','A2','B1','B2','C1','C2','D1','D2'].forEach(n=>{
+  const f=document.createElement('div');f.className='field';f.textContent='Plot '+n;
+  f.addEventListener('click',()=>{
+    f.classList.toggle('wet');
+    toast(f.classList.contains('wet')?'💧 Irrigation started on Plot '+n:'⏹️ Irrigation stopped on Plot '+n);
+  });
+  fields.appendChild(f);
+});
+$('#openPanel').addEventListener('click',()=>{
+  panel.classList.remove('out');panel.classList.add('on');
+  panel.scrollIntoView({behavior:'smooth',block:'center'});
+  toast('🗺️ Field Control connected');
+});
+$('#closePanel').addEventListener('click',()=>{
+  panel.classList.add('out');
+  setTimeout(()=>panel.classList.remove('on','out'),380);
+});
+// Deploy
+$('#deploy').addEventListener('click',()=>{
+  const b=$('#deploy');b.textContent='⏳ Launching…';
+  toast('🛸 12 drones taking off');
+  setTimeout(()=>toast('📡 Scanning 480 acres'),1400);
+  setTimeout(()=>{toast('✅ Pest hotspot found in Plot C2');b.textContent='🚀 Deploy Drone Swarm'},2900);
+});
+$('#bell').addEventListener('click',()=>{count=0;$('#badge').textContent=0;toast('🔔 All alerts cleared')});
+$('#theme').addEventListener('click',()=>{
+  const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#060d0b';
+  r.setAttribute('data-theme',dark?'light':'dark');
+});
+setTimeout(()=>toast('👋 Welcome to AgriNova 2030'),900);
+</script>
+</body>
+</html>

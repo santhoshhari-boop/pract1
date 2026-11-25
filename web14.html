@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brew &amp; Bean – Interactive Café Menu</title>
+<style>
+:root{--bg:#faf5ee;--card:#fff;--ink:#2b1d14;--muted:#7a6656;--brand:#8a4b22;--accent:#d98b3a;--line:#e8dccd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1410;--card:#2a1e17;--ink:#f6ebdd;--muted:#bba48f;--brand:#e0a15f;--accent:#d98b3a;--line:#43322a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1410;--card:#2a1e17;--ink:#f6ebdd;--muted:#bba48f;--brand:#e0a15f;--accent:#d98b3a;--line:#43322a;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+
+/* Entrance logo */
+#intro{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#2b1d14;color:#f6ebdd;transition:opacity .8s,transform .8s}
+#intro.hide{opacity:0;transform:scale(1.15);pointer-events:none}
+#intro svg{width:150px;height:150px}
+.cup{stroke-dasharray:300;stroke-dashoffset:300;animation:draw 1.6s ease forwards}
+.steam{stroke-dasharray:40;stroke-dashoffset:40;animation:draw 1s ease 1.2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+#intro h1{margin:0;font-size:2rem;letter-spacing:.2em;opacity:0;animation:fade 1s ease 1.4s forwards}
+#intro p{margin:0;opacity:0;animation:fade 1s ease 1.9s forwards;color:#d9c3ab}
+@keyframes fade{to{opacity:1}}
+#skip{margin-top:10px;background:none;border:1px solid #d9c3ab;color:#d9c3ab;padding:6px 14px;border-radius:20px;cursor:pointer;transition:.2s}
+#skip:hover,#skip:focus{background:#d9c3ab;color:#2b1d14;outline:none}
+
+/* Header + live logo */
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.2rem;color:var(--brand)}
+.logo svg{width:38px;height:38px;transition:transform .4s}
+.logo:hover svg{transform:rotate(-12deg) scale(1.1)}
+.live-steam{stroke-dasharray:6 6;animation:rise 1.6s linear infinite}
+.live-steam:nth-of-type(2){animation-delay:.5s}
+@keyframes rise{to{stroke-dashoffset:-24}}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);font-weight:500}
+.dot{width:9px;height:9px;border-radius:50%;background:#3bb56b;animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(59,181,107,.6)}100%{box-shadow:0 0 0 10px rgba(59,181,107,0)}}
+.head-right{display:flex;align-items:center;gap:10px}
+button{font:inherit}
+.btn{background:var(--brand);color:#fff;border:0;padding:8px 14px;border-radius:10px;cursor:pointer;transition:transform .15s,opacity .2s}
+:root[data-theme="dark"] .btn{color:#1c1410}
+.btn:hover,.btn:focus{transform:translateY(-2px);opacity:.92;outline:2px solid var(--accent)}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+main{max-width:1100px;margin:0 auto;padding:20px}
+.hero{text-align:center;padding:26px 0 10px}
+.hero h2{margin:0;font-size:1.8rem}
+.hero p{color:var(--muted);margin:6px 0 0}
+
+/* Controls */
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:18px 0}
+.controls input,.controls select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;transition:border .2s,box-shadow .2s}
+.controls input:focus,.controls select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(217,139,58,.3)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 14px;border-radius:20px;cursor:pointer;transition:.2s}
+.chip:hover{transform:translateY(-2px)}
+.chip.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+:root[data-theme="dark"] .chip.active{color:#1c1410}
+#count{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+
+.layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;transition:transform .25s,box-shadow .25s;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-5px);box-shadow:0 10px 24px rgba(0,0,0,.15)}
+.card img{width:100%;aspect-ratio:4/3;border-radius:10px;object-fit:cover;background:var(--line)}
+.card h3{margin:0;font-size:1.05rem}
+.meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.85rem}
+.price{font-weight:700;color:var(--brand);font-size:1.05rem}
+.tag{font-size:.7rem;padding:2px 8px;border-radius:10px;background:var(--line)}
+.card details{font-size:.85rem;color:var(--muted)}
+.card summary{cursor:pointer;color:var(--brand)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+
+/* Cart / calculator */
+aside{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;position:sticky;top:calc(80px + env(safe-area-inset-top,0px))}
+aside h3{margin:0 0 8px}
+#cart{list-style:none;margin:0;padding:0;max-height:240px;overflow-y:auto}
+#cart li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:.92rem}
+#cart .qty{display:flex;align-items:center;gap:6px}
+#cart .qty button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;transition:.15s}
+#cart .qty button:hover{background:var(--accent);color:#fff;transform:scale(1.15)}
+.row{display:flex;justify-content:space-between;margin:6px 0;font-size:.92rem}
+.total{font-weight:700;font-size:1.1rem;border-top:2px solid var(--line);padding-top:8px}
+.tip{display:flex;gap:6px;margin:10px 0}
+.tip button{flex:1;padding:6px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;transition:.2s}
+.tip button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Order receipt */
+.overlay{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.55)}
+.overlay.open{display:flex}
+.receipt{background:var(--card);color:var(--ink);width:100%;max-width:470px;max-height:90vh;overflow-y:auto;border-radius:16px;padding:20px;border:1px solid var(--line);animation:pop .3s ease}
+.receipt h3{margin:0}
+.receipt .sub{color:var(--muted);font-size:.85rem;margin:2px 0 10px}
+.desc{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:10px 0}
+.rl{list-style:none;padding:0;margin:10px 0}
+.rl li{padding:8px 0;border-bottom:1px dashed var(--line)}
+.rl .top{display:flex;justify-content:space-between;font-weight:600}
+.rl small{color:var(--muted)}
+.status{margin:10px 0 0;font-weight:600;color:var(--brand)}
+.actions{display:flex;gap:8px;margin-top:14px}
+.actions .btn{flex:1}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* FAQ accordion */
+.faq{margin-top:34px}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px;transition:box-shadow .2s}
+.faq details:hover{box-shadow:0 4px 14px rgba(0,0,0,.1)}
+.faq summary{cursor:pointer;font-weight:600}
+.faq details[open] summary{color:var(--brand)}
+.faq p{margin:8px 0 0;color:var(--muted)}
+footer{text-align:center;color:var(--muted);padding:30px 0;font-size:.85rem}
+
+@media (max-width:820px){.layout{grid-template-columns:1fr}aside{position:static}.controls{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Entrance logo -->
+<section id="intro" aria-label="Welcome">
+  <svg viewBox="0 0 120 120" fill="none" stroke="#d98b3a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path class="cup" d="M25 50h60v30a22 22 0 0 1-22 22H47a22 22 0 0 1-22-22z"/>
+    <path class="cup" d="M85 58h8a12 12 0 0 1 0 24h-9"/>
+    <path class="steam" d="M42 38c-6-8 6-12 0-22"/>
+    <path class="steam" d="M60 38c-6-8 6-12 0-22"/>
+    <path class="steam" d="M78 38c-6-8 6-12 0-22"/>
+  </svg>
+  <h1>BREW &amp; BEAN</h1>
+  <p>Fresh coffee, made for everyone</p>
+  <button id="skip">Enter menu</button>
+</section>
+
+<header>
+  <div class="logo" aria-label="Brew and Bean logo">
+    <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M25 52h60v28a22 22 0 0 1-22 22H47a22 22 0 0 1-22-22z"/>
+      <path d="M85 60h8a12 12 0 0 1 0 24h-9"/>
+      <path class="live-steam" d="M45 40c-6-8 6-12 0-22"/>
+      <path class="live-steam" d="M68 40c-6-8 6-12 0-22"/>
+    </svg>
+    Brew &amp; Bean
+  </div>
+  <div class="head-right">
+    <span class="live"><span class="dot"></span><span id="liveText">Open now</span></span>
+    <button class="btn ghost" id="theme" aria-label="Toggle theme">◐ Theme</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Our Menu</h2>
+    <p>Search, filter, and build your order – the total updates live.</p>
+  </section>
+
+  <section class="controls">
+    <input id="search" type="search" placeholder="Search drinks and bites…" aria-label="Search menu">
+    <select id="sort" aria-label="Sort">
+      <option value="default">Sort: Featured</option>
+      <option value="low">Price: Low to high</option>
+      <option value="high">Price: High to low</option>
+      <option value="name">Name: A–Z</option>
+    </select>
+    <select id="maxPrice" aria-label="Max price">
+      <option value="999">Any price</option>
+      <option value="150">Under ₹150</option>
+      <option value="250">Under ₹250</option>
+      <option value="350">Under ₹350</option>
+    </select>
+  </section>
+
+  <div class="chips" id="chips"></div>
+  <p id="count"></p>
+
+  <div class="layout">
+    <section class="grid" id="grid"></section>
+
+    <aside>
+      <h3>Your order</h3>
+      <ul id="cart"></ul>
+      <p id="cartEmpty" style="color:var(--muted);font-size:.9rem">Nothing yet – tap “Add” on an item.</p>
+      <div class="tip" id="tips">
+        <button data-tip="0" class="active">No tip</button>
+        <button data-tip="5">5%</button>
+        <button data-tip="10">10%</button>
+      </div>
+      <div class="row"><span>Subtotal</span><span id="sub">₹0</span></div>
+      <div class="row"><span>GST (5%)</span><span id="gst">₹0</span></div>
+      <div class="row"><span>Tip</span><span id="tipAmt">₹0</span></div>
+      <div class="row total"><span>Total</span><span id="total">₹0</span></div>
+      <button class="btn" id="orderNow" style="width:100%;margin-top:10px">Order now</button>
+      <button class="btn ghost" id="clear" style="width:100%;margin-top:8px">Clear order</button>
+    </aside>
+  </div>
+
+  <section class="faq">
+    <h2>Good to know</h2>
+    <details><summary>Do you offer plant-based milk?</summary><p>Yes – oat and almond milk are available for ₹30 extra on any coffee.</p></details>
+    <details><summary>Can I order for a group?</summary><p>Absolutely. Add items to your order and the calculator shows the full bill including GST.</p></details>
+    <details><summary>What are your opening hours?</summary><p>Every day, 7:00 AM to 10:00 PM.</p></details>
+  </section>
+</main>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Order summary">
+  <div class="receipt">
+    <h3>Order summary</h3>
+    <p class="sub" id="rMeta"></p>
+    <div class="desc" id="rDesc"></div>
+    <ul class="rl" id="rLines"></ul>
+    <div class="row"><span>Subtotal</span><span id="rSub"></span></div>
+    <div class="row"><span>GST (5%)</span><span id="rGst"></span></div>
+    <div class="row"><span>Tip</span><span id="rTip"></span></div>
+    <div class="row total"><span>Total to pay</span><span id="rTotal"></span></div>
+    <p class="status" id="rStatus"></p>
+    <div class="actions">
+      <button class="btn ghost" id="rBack">Edit order</button>
+      <button class="btn" id="rConfirm">Confirm order</button>
+    </div>
+  </div>
+</div>
+<footer>© Brew &amp; Bean · Demo project</footer>
+
+<script>
+const MENU = [
+  {id:1,name:"Espresso",cat:"Coffee",price:120,emoji:"☕",bg:"#8a4b22",desc:"Rich double shot with a golden crema."},
+  {id:2,name:"Cappuccino",cat:"Coffee",price:170,emoji:"🥛",bg:"#b9763a",desc:"Equal parts espresso, steamed milk and foam."},
+  {id:3,name:"Filter Coffee",cat:"Coffee",price:90,emoji:"☕",bg:"#6b3a1a",desc:"South Indian style decoction with frothy milk."},
+  {id:4,name:"Cold Brew",cat:"Cold",price:210,emoji:"🧊",bg:"#3f6c8a",desc:"Steeped 18 hours, smooth and low acid."},
+  {id:5,name:"Iced Latte",cat:"Cold",price:190,emoji:"🥤",bg:"#5a8fb0",desc:"Espresso over ice with chilled milk."},
+  {id:6,name:"Mango Smoothie",cat:"Cold",price:180,emoji:"🥭",bg:"#e0a02e",desc:"Fresh mango blended with yogurt."},
+  {id:7,name:"Masala Chai",cat:"Tea",price:80,emoji:"🍵",bg:"#a05a2c",desc:"Spiced tea simmered with ginger and cardamom."},
+  {id:8,name:"Green Tea",cat:"Tea",price:100,emoji:"🍃",bg:"#5a8a4a",desc:"Light, fragrant and antioxidant rich."},
+  {id:9,name:"Butter Croissant",cat:"Bites",price:140,emoji:"🥐",bg:"#c98a3c",desc:"Flaky and baked fresh every morning."},
+  {id:10,name:"Veg Sandwich",cat:"Bites",price:160,emoji:"🥪",bg:"#7a9a4a",desc:"Grilled with cheese, veggies and mint chutney."},
+  {id:11,name:"Chocolate Brownie",cat:"Bites",price:130,emoji:"🍫",bg:"#4a2a1c",desc:"Fudgy, warm, with a molten centre."},
+  {id:12,name:"Blueberry Muffin",cat:"Bites",price:110,emoji:"🧁",bg:"#6a5a9a",desc:"Soft muffin packed with blueberries."}
+];
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const grid = $("#grid"), chipsBox = $("#chips"), cartEl = $("#cart");
+let state = {cat:"All", q:"", sort:"default", max:999, tip:0, cart:{}};
+
+// Generate an image (SVG data URI) for each item
+function pic(item){
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${item.bg}"/><stop offset="1" stop-color="#2b1d14"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><text x="200" y="185" font-size="120" text-anchor="middle">${item.emoji}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+// Category chips
+function buildChips(){
+  const cats = ["All", ...new Set(MENU.map(m => m.cat))];
+  chipsBox.innerHTML = "";
+  cats.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "chip" + (c === state.cat ? " active" : "");
+    b.textContent = c;
+    b.addEventListener("click", () => {
+      state.cat = c;
+      $$(".chip").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      render();
+    });
+    chipsBox.appendChild(b);
+  });
+}
+
+// Filter + sort + render
+function render(){
+  let list = MENU.filter(m =>
+    (state.cat === "All" || m.cat === state.cat) &&
+    m.price <= state.max &&
+    (m.name + " " + m.desc + " " + m.cat).toLowerCase().includes(state.q)
+  );
+  if(state.sort === "low") list.sort((a,b) => a.price - b.price);
+  if(state.sort === "high") list.sort((a,b) => b.price - a.price);
+  if(state.sort === "name") list.sort((a,b) => a.name.localeCompare(b.name));
+
+  grid.innerHTML = "";
+  if(!list.length){
+    grid.innerHTML = '<div class="empty">No items match. Try another search or filter.</div>';
+  }
+  list.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <img src="${pic(m)}" alt="${m.name}">
+      <h3>${m.name}</h3>
+      <div class="meta"><span class="tag">${m.cat}</span><span class="price">₹${m.price}</span></div>
+      <details><summary>Details</summary>${m.desc}</details>
+      <button class="btn" data-id="${m.id}">Add</button>`;
+    card.querySelector("button").addEventListener("click", () => addItem(m.id));
+    grid.appendChild(card);
+  });
+  $("#count").textContent = `Showing ${list.length} of ${MENU.length} items`;
+}
+
+// Cart + calculator
+function addItem(id){ state.cart[id] = (state.cart[id] || 0) + 1; renderCart(); }
+function changeQty(id, d){
+  state.cart[id] = (state.cart[id] || 0) + d;
+  if(state.cart[id] <= 0) delete state.cart[id];
+  renderCart();
+}
+function renderCart(){
+  cartEl.innerHTML = "";
+  let sub = 0;
+  Object.keys(state.cart).forEach(id => {
+    const item = MENU.find(m => m.id === Number(id));
+    const q = state.cart[id];
+    sub += item.price * q;
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${item.name}</span>
+      <span class="qty"><button aria-label="Remove one">−</button><b>${q}</b><button aria-label="Add one">+</button></span>
+      <span>₹${item.price * q}</span>`;
+    const [minus, plus] = li.querySelectorAll("button");
+    minus.addEventListener("click", () => changeQty(item.id, -1));
+    plus.addEventListener("click", () => changeQty(item.id, 1));
+    cartEl.appendChild(li);
+  });
+  $("#cartEmpty").classList.toggle("hidden", sub > 0);
+  $("#cartEmpty").style.display = sub > 0 ? "none" : "block";
+  const gst = Math.round(sub * 0.05);
+  const tip = Math.round(sub * state.tip / 100);
+  $("#sub").textContent = "₹" + sub;
+  $("#gst").textContent = "₹" + gst;
+  $("#tipAmt").textContent = "₹" + tip;
+  $("#total").textContent = "₹" + (sub + gst + tip);
+}
+
+// Event listeners
+$("#search").addEventListener("input", e => { state.q = e.target.value.trim().toLowerCase(); render(); });
+$("#sort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+$("#maxPrice").addEventListener("change", e => { state.max = Number(e.target.value); render(); });
+$$("#tips button").forEach(b => b.addEventListener("click", () => {
+  $$("#tips button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  state.tip = Number(b.dataset.tip);
+  renderCart();
+}));
+$("#clear").addEventListener("click", () => { state.cart = {}; renderCart(); });
+
+// Theme toggle
+$("#theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme === "dark" || (!root.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  root.dataset.theme = dark ? "light" : "dark";
+});
+
+// Entrance logo: auto-hide or skip
+function closeIntro(){ $("#intro").classList.add("hide"); }
+$("#skip").addEventListener("click", closeIntro);
+setTimeout(closeIntro, 4200);
+
+// Live status text
+function updateLive(){
+  const h = new Date().getHours();
+  $("#liveText").textContent = (h >= 7 && h < 22) ? "Open now · brewing" : "Closed · opens 7 AM";
+}
+updateLive(); setInterval(updateLive, 60000);
+
+// Order now: itemised bill, line by line, with description
+let orderNo = 1000;
+function openReceipt(){
+  const ids = Object.keys(state.cart);
+  if(!ids.length){
+    const e = $("#cartEmpty");
+    e.classList.remove("shake"); void e.offsetWidth; e.classList.add("shake");
+    return;
+  }
+  let sub = 0, count = 0;
+  const parts = [];
+  const lines = ids.map((id, i) => {
+    const it = MENU.find(m => m.id === Number(id));
+    const q = state.cart[id], t = it.price * q;
+    sub += t; count += q; parts.push(q + " × " + it.name);
+    return `<li><div class="top"><span>${i + 1}. ${it.name}</span><span>₹${t}</span></div><small>${q} × ₹${it.price} each · ${it.desc}</small></li>`;
+  }).join("");
+  const gst = Math.round(sub * 0.05), tip = Math.round(sub * state.tip / 100);
+  orderNo++;
+  $("#rMeta").textContent = `Order #${orderNo} · ${new Date().toLocaleString()}`;
+  $("#rDesc").textContent = `Order description: ${count} item${count > 1 ? "s" : ""} across ${ids.length} product${ids.length > 1 ? "s" : ""} – ${parts.join(", ")}.`;
+  $("#rLines").innerHTML = lines;
+  $("#rSub").textContent = "₹" + sub;
+  $("#rGst").textContent = "₹" + gst;
+  $("#rTip").textContent = "₹" + tip;
+  $("#rTotal").textContent = "₹" + (sub + gst + tip);
+  $("#rStatus").textContent = "";
+  $("#rConfirm").style.display = "";
+  $("#overlay").classList.add("open");
+}
+$("#orderNow").addEventListener("click", openReceipt);
+$("#rBack").addEventListener("click", () => $("#overlay").classList.remove("open"));
+$("#overlay").addEventListener("click", e => { if(e.target.id === "overlay") $("#overlay").classList.remove("open"); });
+document.addEventListener("keydown", e => { if(e.key === "Escape") $("#overlay").classList.remove("open"); });
+$("#rConfirm").addEventListener("click", () => {
+  $("#rStatus").textContent = `✔ Order #${orderNo} confirmed – your items are being prepared.`;
+  $("#rConfirm").style.display = "none";
+  $("#rBack").textContent = "Close";
+  state.cart = {}; renderCart();
+});
+
+buildChips(); render(); renderCart();
+</script>
+</body>
+</html>

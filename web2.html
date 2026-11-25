@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ocean Explorer – HTML5 Multimedia Page</title>
+<style>
+/* ===== Design tokens (light + dark) ===== */
+:root{--bg:#f4f9fb;--card:#fff;--text:#12303b;--muted:#4b6b78;--accent:#0b7a9e;--line:#cfe0e7;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#08171d;--card:#10272f;--text:#e3f2f7;--muted:#9bbac6;--accent:#4cc3e8;--line:#244753;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+header,main,footer{max-width:960px;margin:auto;padding:0 20px}
+header{padding-top:28px}
+h1{font-size:clamp(1.8rem,5vw,2.8rem);margin:.2em 0}
+h2{margin-top:0;color:var(--accent)}
+nav a{color:var(--accent);margin-right:14px;font-weight:600}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin:26px 0}
+/* ===== Media: always responsive ===== */
+img,video,iframe{max-width:100%;border-radius:10px;display:block}
+video,iframe{width:100%}
+figure{margin:0}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:6px}
+audio{width:100%}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.gallery img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+iframe{height:260px;border:1px solid var(--line)}
+.status{font-size:.9rem;color:var(--muted)}
+details{margin-top:10px}
+.skip{position:absolute;left:-999px}.skip:focus{left:10px;top:10px;background:var(--card);padding:6px}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header>
+  <h1>🌊 Ocean Explorer</h1>
+  <p>A tour of the sea using HTML5 multimedia: images, audio, video and embedded content.</p>
+  <nav aria-label="Sections">
+    <a href="#images">Images</a><a href="#audio">Audio</a><a href="#video">Video</a><a href="#embed">Embed</a>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- ========== 1. IMAGES ==========
+ <figure>/<figcaption> pairs a picture with a visible caption.
+ alt text describes the image for screen readers; loading="lazy" defers off-screen images.
+ width/height reserve space and avoid layout shift. src values are filled by script below
+ (generated SVG); in production use real files, e.g. <img src="reef.jpg" srcset="reef-2x.jpg 2x"> -->
+<section id="images" aria-labelledby="h-img">
+  <h2 id="h-img">Image gallery</h2>
+  <div class="gallery">
+    <figure>
+      <img id="img1" width="600" height="400" loading="lazy" alt="Illustration of sunlit blue water with a school of orange fish swimming above a coral reef.">
+      <figcaption>Fig. 1 – Coral reef: home to about 25% of marine species.</figcaption>
+    </figure>
+    <figure>
+      <img id="img2" width="600" height="400" loading="lazy" alt="Illustration of a dark blue deep sea with a glowing jellyfish in the centre.">
+      <figcaption>Fig. 2 – Deep sea: a glowing jellyfish drifts in the dark.</figcaption>
+    </figure>
+    <figure>
+      <!-- <picture> lets the browser choose a source by media query (art direction) -->
+      <picture>
+        <source id="img3wide" media="(min-width:700px)" type="image/svg+xml">
+        <img id="img3" width="600" height="400" loading="lazy" alt="Illustration of a golden sunset over calm ocean waves with a small sailboat.">
+      </picture>
+      <figcaption>Fig. 3 – Sunset over open water.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ========== 2. AUDIO ==========
+ controls shows native player; preload="metadata" loads only duration.
+ Audio has no built-in captions, so a transcript is supplied for accessibility.
+ Replace the generated source with <source src="waves.mp3" type="audio/mpeg"> + .ogg fallback. -->
+<section id="audio" aria-labelledby="h-aud">
+  <h2 id="h-aud">Ocean sounds</h2>
+  <figure>
+    <audio id="aud" controls loop preload="metadata" aria-label="Ocean waves ambient sound">
+      Your browser does not support the audio element.
+    </audio>
+    <figcaption>Synthesised ambient waves (6 s loop) generated in the browser.</figcaption>
+  </figure>
+  <details>
+    <summary>Transcript</summary>
+    <p>[Soft waves rise and fall, washing onto a shore. No speech.]</p>
+  </details>
+</section>
+
+<!-- ========== 3. VIDEO ==========
+ controls, playsinline (mobile), poster (preview frame) and <track> captions.
+ <track kind="captions"> gives timed WebVTT text; kind="descriptions" can also be added.
+ Real use: <source src="reef.mp4" type="video/mp4"> and <source src="reef.webm" type="video/webm"> -->
+<section id="video" aria-labelledby="h-vid">
+  <h2 id="h-vid">Video: waves in motion</h2>
+  <figure>
+    <video id="vid" controls playsinline preload="metadata" width="640" height="360" aria-describedby="vid-cap">
+      Your browser does not support the video element.
+    </video>
+    <figcaption id="vid-cap">A short animated clip rendered in your browser. Turn on captions (CC) in the player.</figcaption>
+  </figure>
+  <p class="status" id="vstatus" role="status">Rendering the preview clip…</p>
+</section>
+
+<!-- ========== 4. IFRAME ==========
+ Embeds another document. title is required for accessibility.
+ sandbox limits what embedded content can do (here: scripts only).
+ srcdoc keeps this demo self-contained; for external content use
+ <iframe src="https://www.youtube-nocookie.com/embed/VIDEO_ID" allowfullscreen loading="lazy">
+ or an OpenStreetMap / Google Maps embed URL. -->
+<section id="embed" aria-labelledby="h-emb">
+  <h2 id="h-emb">Embedded content: tide calculator</h2>
+  <iframe title="Interactive tide height calculator" sandbox="allow-scripts" loading="lazy" srcdoc="
+    <body style='font-family:system-ui;margin:16px;background:#e8f6fb;color:#12303b'>
+    <h3 style='margin-top:0'>Tide height</h3>
+    <label for=h>Hour of day: <output id=o>6</output>:00</label><br>
+    <input id=h type=range min=0 max=23 value=6 style='width:90%'>
+    <p>Estimated tide: <b id=t></b> m</p>
+    <script>
+      var h=document.getElementById('h'),o=document.getElementById('o'),t=document.getElementById('t');
+      function u(){o.textContent=h.value;t.textContent=(1.5+1.2*Math.sin(h.value*Math.PI/6.2)).toFixed(2)}
+      h.oninput=u;u();
+    <\/script></body>"></iframe>
+  <p class="status">The iframe is sandboxed, so it cannot access this page.</p>
+</section>
+</main>
+
+<footer><p class="status">Built with &lt;img&gt;, &lt;picture&gt;, &lt;audio&gt;, &lt;video&gt;, &lt;track&gt; and &lt;iframe&gt;.</p></footer>
+
+<script>
+/* ===== Helper: build an SVG illustration as a data URI (stand-in for real image files) ===== */
+function svgURI(inner){
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">'+inner+'</svg>');
+}
+var fish=function(x,y,c){return '<g transform="translate('+x+' '+y+')"><ellipse rx="22" ry="10" fill="'+c+'"/><path d="M20 0l16-10v20z" fill="'+c+'"/><circle cx="-12" cy="-2" r="2" fill="#000"/></g>'};
+var reef=svgURI('<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fd0e8"/><stop offset="1" stop-color="#0a5a8a"/></linearGradient></defs><rect width="600" height="400" fill="url(#g)"/>'+
+  fish(150,120,'#ff8a3d')+fish(260,170,'#ff8a3d')+fish(360,100,'#ffb347')+fish(440,200,'#ff8a3d')+
+  '<path d="M0 400V330q40-60 80 0t80-30 80 40 80-50 80 40 80-30 120 30v70z" fill="#e8567c"/><path d="M0 400V370q60-40 120 0t120-20 120 20 120-30 120 30v30z" fill="#7a2c5e"/>');
+var deep=svgURI('<rect width="600" height="400" fill="#020b1f"/><g fill="#7df9ff" opacity=".8"><circle cx="80" cy="60" r="2"/><circle cx="500" cy="90" r="2"/><circle cx="420" cy="330" r="3"/><circle cx="120" cy="320" r="2"/></g>'+
+  '<path d="M240 190q60-110 120 0z" fill="#b388ff" opacity=".9"/><g stroke="#b388ff" stroke-width="4" fill="none" opacity=".8"><path d="M260 190q-10 50 5 90M290 190q10 60-5 100M320 190q-10 50 5 80M345 190q10 50-5 70"/></g>');
+var sunset=svgURI('<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7e5f"/><stop offset="1" stop-color="#feb47b"/></linearGradient></defs><rect width="600" height="230" fill="url(#s)"/><circle cx="300" cy="200" r="60" fill="#fff3b0"/>'+
+  '<rect y="230" width="600" height="170" fill="#1b5e84"/><path d="M0 260q50-15 100 0t100 0 100 0 100 0 100 0 100 0" stroke="#7fc4e3" stroke-width="4" fill="none"/><path d="M420 300h50l-10 20h-30z" fill="#3b2a20"/><path d="M445 230v70l30-15z" fill="#fff"/>');
+document.getElementById('img1').src=reef;
+document.getElementById('img2').src=deep;
+document.getElementById('img3').src=sunset;
+document.getElementById('img3wide').srcset=sunset;
+
+/* ===== AUDIO: synthesise 6 s of "waves" (low-passed noise with a slow swell) as a WAV file ===== */
+(function(){
+  try{
+    var sr=22050,secs=6,n=sr*secs,buf=new ArrayBuffer(44+n*2),v=new DataView(buf);
+    function w(o,s){for(var i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))}
+    w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);
+    v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+    w(36,'data');v.setUint32(40,n*2,true);
+    var last=0;
+    for(var i=0;i<n;i++){
+      last=last*0.96+(Math.random()*2-1)*0.04;            // low-pass filtered noise
+      var swell=0.5+0.5*Math.sin(2*Math.PI*i/(sr*3));       // 3 s wave cycle (loops cleanly)
+      v.setInt16(44+i*2,Math.max(-1,Math.min(1,last*6*swell))*20000,true);
+    }
+    document.getElementById('aud').src=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+  }catch(e){console.error('Audio generation failed',e)}
+})();
+
+/* ===== VIDEO: record an animated canvas to a WebM blob, then attach captions ===== */
+(function(){
+  var vid=document.getElementById('vid'),st=document.getElementById('vstatus');
+  /* WebVTT captions as a Blob URL; with a real file use <track src="captions.vtt"> */
+  var vtt='WEBVTT\n\n00:00.000 --> 00:03.000\nThe sea begins to swell…\n\n00:03.000 --> 00:06.000\nA fish glides through the waves.\n';
+  var tr=document.createElement('track');
+  tr.kind='captions';tr.label='English';tr.srclang='en';tr.default=true;
+  tr.src=URL.createObjectURL(new Blob([vtt],{type:'text/vtt'}));
+  vid.appendChild(tr);
+
+  if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){st.textContent='Video preview is not supported in this browser.';return}
+  var c=document.createElement('canvas');c.width=640;c.height=360;var g=c.getContext('2d'),t0=performance.now();
+  function frame(){
+    var t=(performance.now()-t0)/1000;
+    g.fillStyle='#0b6e99';g.fillRect(0,0,640,360);
+    for(var k=0;k<4;k++){                                   // layered sine waves
+      g.fillStyle='rgba(255,255,255,'+(0.12+k*0.06)+')';g.beginPath();g.moveTo(0,360);
+      for(var x=0;x<=640;x+=8)g.lineTo(x,180+k*40+Math.sin(x/60+t*2+k)*14);
+      g.lineTo(640,360);g.fill();
+    }
+    g.fillStyle='#ff8a3d';var fx=(t*100)%700-30,fy=210+Math.sin(t*3)*20;  // swimming fish
+    g.beginPath();g.ellipse(fx,fy,22,10,0,0,7);g.fill();g.beginPath();g.moveTo(fx+18,fy);g.lineTo(fx+34,fy-10);g.lineTo(fx+34,fy+10);g.fill();
+    g.fillStyle='#fff';g.font='20px sans-serif';g.fillText('Ocean Explorer',20,34);
+  }
+  frame();vid.poster=c.toDataURL('image/png');              // poster = first frame
+  var chunks=[],rec;
+  try{rec=new MediaRecorder(c.captureStream(30))}catch(e){st.textContent='Video preview could not be created.';return}
+  rec.ondataavailable=function(e){if(e.data.size)chunks.push(e.data)};
+  rec.onstop=function(){clearInterval(iv);vid.src=URL.createObjectURL(new Blob(chunks,{type:'video/webm'}));st.textContent='Clip ready – press play.'};
+  var iv=setInterval(frame,33);rec.start();setTimeout(function(){rec.stop()},6000);
+})();
+</script>
+</body>
+</html>

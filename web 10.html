@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Industry Directory</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏭</text></svg>">
+<style>
+:root{
+  --bg:#e8edee; --panel:#f7f9f9; --ink:#14262e; --muted:#5a6c72; --line:#b9c6c9;
+  --accent:#0f6b6b; --accent-ink:#ffffff; --signal:#e0a100; --danger:#a63a2b;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1a1e; --panel:#172429; --ink:#e4edee; --muted:#93a6ab; --line:#2f444b;
+    --accent:#3fb3a8; --accent-ink:#0a1416; --signal:#f0b429; --danger:#e58a7b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1a1e; --panel:#172429; --ink:#e4edee; --muted:#93a6ab; --line:#2f444b;
+  --accent:#3fb3a8; --accent-ink:#0a1416; --signal:#f0b429; --danger:#e58a7b;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2{font-family:"Archivo",system-ui,sans-serif;margin:0}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 48px}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;
+  border-bottom:4px solid var(--signal);padding-bottom:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-.02em}
+.top p{margin:4px 0 0;color:var(--muted)}
+.count{display:inline-block;border:2px solid var(--ink);padding:4px 12px;font-weight:700}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start}
+@media (max-width:760px){.layout{grid-template-columns:1fr}}
+section.panel{background:var(--panel);border:1px solid var(--line);padding:20px;position:relative}
+section.panel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--accent)}
+section.panel.editing::before{background:var(--signal)}
+h2{font-size:1.15rem;margin-bottom:12px}
+label{display:block;font-size:.85rem;font-weight:600;margin:12px 0 4px}
+input{width:100%;padding:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;border-radius:0}
+input:focus-visible,button:focus-visible{outline:3px solid var(--signal);outline-offset:1px}
+.row{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;padding:9px 14px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.danger{border-color:var(--danger);color:var(--danger)}
+button:hover{filter:brightness(1.1)}
+.msg{min-height:1.4em;margin:10px 0 0;font-size:.9rem;color:var(--danger)}
+ul#list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+li.item{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;
+  padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--accent)}
+li.item .info{flex:1 1 220px;min-width:0}
+li.item .name{font-weight:700;font-size:1.05rem;display:block}
+li.item .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:.85rem;color:var(--muted)}
+.tag{border:1px solid var(--line);padding:1px 8px}
+.tag.sector{background:var(--signal);color:#14262e;border-color:var(--signal);font-weight:600}
+.actions{display:flex;gap:6px}
+.empty{padding:24px;border:2px dashed var(--line);color:var(--muted);text-align:center}
+@keyframes added{from{background:var(--signal)}to{background:var(--panel)}}
+li.item.new{animation:added 1.2s ease-out}
+@media (prefers-reduced-motion:reduce){li.item.new{animation:none}}
+.intro{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:#0f1a1e;color:#e4edee;transition:transform .8s cubic-bezier(.7,0,.2,1)}
+.intro.leave{transform:translateY(-100%)}
+.logo{width:min(220px,50vw);height:auto;overflow:visible}
+.logo *{fill:none;stroke:#f0b429;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.logo .teeth{stroke-width:8;stroke-dasharray:9.42 9.42;transform-origin:0 0;animation:spin 6s linear infinite,fade .8s ease-out both}
+.logo .ring{stroke:#3fb3a8;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1s .2s ease-out forwards}
+.logo .plant{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.2s .8s ease-out forwards}
+.logo .smoke{stroke:#93a6ab;stroke-width:2;opacity:0;animation:rise 1.6s 1.8s ease-out infinite}
+.logo .smoke.b{animation-delay:2.4s}
+.wordmark{display:flex;font:800 clamp(1.6rem,6vw,2.6rem)/1 "Archivo",system-ui,sans-serif;letter-spacing:-.02em}
+.wordmark span{display:inline-block;opacity:0;transform:translateY(24px) rotate(6deg);animation:letter .5s ease-out forwards}
+.tagline{margin:0;color:#93a6ab;opacity:0;animation:fade .8s 2.3s forwards}
+.skip{position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));color:#e4edee;border-color:#93a6ab}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes letter{to{opacity:1;transform:none}}
+@keyframes rise{0%{opacity:0;transform:translateY(0)}30%{opacity:.9}100%{opacity:0;transform:translateY(-22px)}}
+@media (prefers-reduced-motion:reduce){.intro,.logo *,.wordmark span,.tagline{animation:none!important;transition:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}.logo .smoke{opacity:0!important}}
+</style>
+</head>
+<body>
+<div class="intro" id="intro" role="dialog" aria-label="Welcome">
+  <svg class="logo" viewBox="-40 -40 80 80" aria-hidden="true">
+    <circle class="teeth" r="31"/>
+    <circle class="ring" r="25" pathLength="1"/>
+    <path class="plant" pathLength="1" d="M-15 14V-2l9 5V-3l9 5V-14h9v28z"/>
+    <path class="smoke" d="M8 -18q-4 -5 0 -9"/>
+    <path class="smoke b" d="M12 -18q4 -5 0 -9"/>
+  </svg>
+  <div class="wordmark" id="wordmark" aria-label="Industry Directory"></div>
+  <p class="tagline">Every sector. One directory.</p>
+  <button class="skip" id="skip">Skip intro</button>
+</div>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Industry Directory</h1>
+      <p>Track companies by sector, location and workforce size.</p>
+    </div>
+    <span class="count" id="count">0 companies</span>
+  </header>
+
+  <div class="layout">
+    <section class="panel" id="formPanel">
+      <h2 id="formTitle">Add a company</h2>
+      <label for="name">Company name</label>
+      <input id="name" type="text" placeholder="e.g. Tata Steel">
+      <label for="sector">Sector</label>
+      <input id="sector" type="text" placeholder="e.g. Manufacturing">
+      <label for="location">Location</label>
+      <input id="location" type="text" placeholder="e.g. Jamshedpur">
+      <label for="employees">Employees</label>
+      <input id="employees" type="number" min="0" placeholder="e.g. 35000">
+      <p class="msg" id="msg"></p>
+      <div class="row">
+        <button class="primary" id="saveBtn">Add company</button>
+        <button id="cancelBtn" style="display:none">Cancel edit</button>
+      </div>
+    </section>
+
+    <section>
+      <label for="filter" style="margin-top:0">Filter by name, sector or location</label>
+      <input id="filter" type="text" placeholder="Type to filter the list">
+      <ul id="list"></ul>
+    </section>
+  </div>
+</div>
+
+<script>
+  // In-memory data: the page never reloads, the DOM is rebuilt from this array.
+  let companies = [
+    {id:1, name:"Ashok Leyland", sector:"Automotive", location:"Chennai", employees:11000},
+    {id:2, name:"Infosys", sector:"IT Services", location:"Bengaluru", employees:320000},
+    {id:3, name:"Sun Pharma", sector:"Pharmaceuticals", location:"Mumbai", employees:36000}
+  ];
+  let nextId = 4;
+  let editingId = null;
+
+  const nameEl = document.getElementById("name");
+  const sectorEl = document.getElementById("sector");
+  const locationEl = document.getElementById("location");
+  const employeesEl = document.getElementById("employees");
+  const saveBtn = document.getElementById("saveBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const msgEl = document.getElementById("msg");
+  const listEl = document.getElementById("list");
+  const countEl = document.getElementById("count");
+  const filterEl = document.getElementById("filter");
+  const formTitle = document.getElementById("formTitle");
+
+  function makeButton(label, cls, id, action) {
+    const b = document.createElement("button");
+    b.textContent = label;
+    if (cls) b.setAttribute("class", cls);
+    b.setAttribute("aria-label", label + " " + id);
+    b.addEventListener("click", action);
+    return b;
+  }
+
+  // Display: rebuild the list from data, applying the filter.
+  function render(newId) {
+    const q = filterEl.value.trim().toLowerCase();
+    const shown = companies.filter(c =>
+      (c.name + " " + c.sector + " " + c.location).toLowerCase().includes(q));
+    listEl.innerHTML = "";
+
+    if (shown.length === 0) {
+      const empty = document.createElement("div");
+      empty.setAttribute("class", "empty");
+      empty.textContent = companies.length === 0
+        ? "No companies yet. Add one using the form."
+        : "No companies match your filter.";
+      listEl.appendChild(empty);
+    }
+
+    shown.forEach(c => {
+      const li = document.createElement("li");
+      li.setAttribute("class", "item" + (c.id === newId ? " new" : ""));
+
+      const info = document.createElement("div");
+      info.setAttribute("class", "info");
+      const name = document.createElement("span");
+      name.setAttribute("class", "name");
+      name.textContent = c.name;
+      const meta = document.createElement("div");
+      meta.setAttribute("class", "meta");
+      const s1 = document.createElement("span");
+      s1.setAttribute("class", "tag sector");
+      s1.textContent = c.sector;
+      const s2 = document.createElement("span");
+      s2.setAttribute("class", "tag");
+      s2.textContent = c.location;
+      const s3 = document.createElement("span");
+      s3.setAttribute("class", "tag");
+      s3.textContent = c.employees.toLocaleString("en-IN") + " employees";
+      meta.appendChild(s1); meta.appendChild(s2); meta.appendChild(s3);
+      info.appendChild(name); info.appendChild(meta);
+
+      const actions = document.createElement("div");
+      actions.setAttribute("class", "actions");
+      actions.appendChild(makeButton("Edit", "", c.name, () => startEdit(c.id)));
+      actions.appendChild(makeButton("Remove", "danger", c.name, () => removeCompany(c.id, li)));
+
+      li.appendChild(info); li.appendChild(actions);
+      listEl.appendChild(li);
+    });
+
+    countEl.textContent = companies.length + (companies.length === 1 ? " company" : " companies");
+  }
+
+  function resetForm() {
+    nameEl.value = sectorEl.value = locationEl.value = employeesEl.value = "";
+    editingId = null;
+    saveBtn.textContent = "Add company";
+    formTitle.textContent = "Add a company";
+    cancelBtn.style.display = "none";
+    document.querySelector("#formPanel").classList.remove("editing");
+    msgEl.textContent = "";
+  }
+
+  // Add or Modify
+  function saveCompany() {
+    const data = {
+      name: nameEl.value.trim(),
+      sector: sectorEl.value.trim(),
+      location: locationEl.value.trim(),
+      employees: parseInt(employeesEl.value, 10)
+    };
+    if (!data.name || !data.sector || !data.location || isNaN(data.employees) || data.employees < 0) {
+      msgEl.textContent = "Fill in every field. Employees must be 0 or more.";
+      return;
+    }
+    let highlight = null;
+    if (editingId === null) {
+      data.id = nextId++;
+      companies.push(data);
+      highlight = data.id;
+    } else {
+      const target = companies.find(c => c.id === editingId);
+      Object.assign(target, data);
+      highlight = editingId;
+    }
+    resetForm();
+    render(highlight);
+  }
+
+  function startEdit(id) {
+    const c = companies.find(x => x.id === id);
+    editingId = id;
+    nameEl.value = c.name;
+    sectorEl.value = c.sector;
+    locationEl.value = c.location;
+    employeesEl.value = c.employees;
+    saveBtn.textContent = "Save changes";
+    formTitle.textContent = "Edit " + c.name;
+    cancelBtn.style.display = "inline-block";
+    document.querySelector("#formPanel").classList.add("editing");
+    nameEl.focus();
+  }
+
+  // Remove: delete from data and remove the element itself from the DOM.
+  function removeCompany(id, li) {
+    companies = companies.filter(c => c.id !== id);
+    li.remove();
+    if (editingId === id) resetForm();
+    render();
+  }
+
+  saveBtn.addEventListener("click", saveCompany);
+  cancelBtn.addEventListener("click", resetForm);
+  filterEl.addEventListener("input", () => render());
+  [nameEl, sectorEl, locationEl, employeesEl].forEach(el =>
+    el.addEventListener("keydown", e => { if (e.key === "Enter") saveCompany(); }));
+
+  render();
+
+  // Entrance logo: build the wordmark letter by letter, then slide the intro away.
+  const intro = document.getElementById("intro");
+  const wordmark = document.getElementById("wordmark");
+  "Industry Directory".split("").forEach((ch, i) => {
+    const s = document.createElement("span");
+    s.textContent = ch === " " ? "\u00a0" : ch;
+    s.style.animationDelay = (1.4 + i * 0.05) + "s";
+    wordmark.appendChild(s);
+  });
+  let leaving = false;
+  function leaveIntro() {
+    if (leaving) return;
+    leaving = true;
+    intro.classList.add("leave");
+    setTimeout(() => intro.remove(), 900);
+  }
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  setTimeout(leaveIntro, reduce ? 800 : 3800);
+  document.getElementById("skip").addEventListener("click", leaveIntro);
+  intro.addEventListener("click", leaveIntro);
+</script>
+</body>
+</html>

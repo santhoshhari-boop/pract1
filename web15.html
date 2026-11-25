@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CareBeat – Ward Monitor</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef3f2; --surface:#ffffff; --text:#12302c; --muted:#5b726e; --line:#d3dfdc;
+  --track-off:#9fb1ae; --track-on:#d32f2f; --knob:#ffffff;
+  --ok:#0d7a6b; --crit:#d32f2f; --crit-bg:#fdeaea; --screen:#0b1514;
+  font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1b19; --surface:#172825; --text:#e3f0ed; --muted:#93aaa6; --line:#294541;
+    --track-off:#4b605c; --track-on:#ef5350; --knob:#f4fbfa;
+    --ok:#4fd1bd; --crit:#ff6b6b; --crit-bg:#3a1a1a; --screen:#070f0e;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1b19; --surface:#172825; --text:#e3f0ed; --muted:#93aaa6; --line:#294541;
+  --track-off:#4b605c; --track-on:#ef5350; --knob:#f4fbfa;
+  --ok:#4fd1bd; --crit:#ff6b6b; --crit-bg:#3a1a1a; --screen:#070f0e;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;padding:24px 16px;display:flex;justify-content:center}
+.app{width:100%;max-width:680px;transition:box-shadow .3s}
+.app.alert-on.has-critical{box-shadow:0 0 0 3px var(--crit);border-radius:16px;padding:8px;margin:-8px}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.head svg{width:44px;height:44px;flex:none}
+html{background:var(--bg)}
+.fs-btn{margin-left:auto;font:inherit;font-size:.85rem;font-weight:600;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;flex:none}
+.fs-btn:focus-visible{outline:3px solid var(--crit);outline-offset:2px}
+:fullscreen body,:-webkit-full-screen body{overflow:auto}
+:fullscreen .app{max-width:1100px}
+h1{font-size:1.35rem;margin:0}
+.sub{color:var(--muted);margin:2px 0 0;font-size:.9rem}
+
+/* Entrance logo */
+#splash{position:fixed;inset:0;z-index:50;background:#0b2a26;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;cursor:pointer;transition:opacity .6s ease,visibility .6s}
+#splash.hide{opacity:0;visibility:hidden}
+#splash svg{width:120px;height:120px}
+#splash .name{color:#e8fffb;font-size:2rem;font-weight:700;letter-spacing:.04em;margin:0}
+#splash .tag{color:#8fc9c0;margin:0;font-size:.95rem}
+#splash .heart{transform-origin:center;animation:beat 1s ease-in-out infinite}
+#splash .line{stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1.6s ease forwards}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.08)}30%{transform:scale(1)}45%{transform:scale(1.05)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* Toggle */
+.setting{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.setting .info{flex:1}
+.setting .title{font-weight:700;margin:0}
+.setting .desc{margin:2px 0 0;color:var(--muted);font-size:.88rem}
+.switch{display:flex;align-items:center;gap:10px;cursor:pointer}
+.state{font-weight:700;font-size:.85rem;min-width:28px;text-align:right;color:var(--muted)}
+.app.alert-on .state{color:var(--crit)}
+.switch input{
+  -webkit-appearance:none;appearance:none;position:relative;width:60px;height:32px;margin:0;
+  border-radius:32px;background:var(--track-off);transition:background .3s ease;cursor:pointer;flex:none;
+}
+.switch input::before{
+  content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;
+  background:var(--knob);box-shadow:0 1px 3px rgba(0,0,0,.35);transition:transform .3s ease;
+}
+.switch input:checked{background:var(--track-on)}
+.switch input:checked::before{transform:translateX(28px)}
+.switch input:focus-visible{outline:3px solid var(--crit);outline-offset:3px}
+
+.banner{margin:14px 0 6px;padding:12px 16px;border-radius:10px;font-size:.92rem;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.app.alert-on .banner{border-color:var(--crit);color:var(--crit);font-weight:600}
+.app.alert-on.has-critical .banner{background:var(--crit);border-color:var(--crit);color:#fff;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.75}}
+.hint{font-size:.82rem;color:var(--muted);margin:0 0 12px;min-height:1.1em}
+
+/* Monitors */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.mon{background:var(--screen);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:#8fc9c0}
+.mon.wide{grid-column:1/-1}
+.mon .top{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;gap:8px}
+.mon .val{font-size:2.2rem;font-weight:700;line-height:1.1;color:#3ddc97;margin-top:2px}
+.mon.wide .val{font-size:2.6rem}
+.mon .val small{font-size:.85rem;font-weight:600;margin-left:4px}
+.mon canvas{width:100%;height:70px;display:block;margin-top:4px}
+.mon.wide canvas{height:100px}
+.mon .foot{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;margin-top:4px}
+.mon.critical{border-color:var(--crit)}
+.mon.critical .val,.mon.critical .top{color:#ff5252}
+.app.alert-on .mon.critical{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--crit) 40%,transparent)}}
+.snd{font:inherit;font-size:.78rem;color:#8fc9c0;background:transparent;border:1px solid #2f5a54;border-radius:20px;padding:2px 10px;cursor:pointer}
+.snd.muted{opacity:.55;text-decoration:line-through}
+.snd:focus-visible{outline:2px solid #ff5252}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.log{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.88rem;max-height:160px;overflow-y:auto}
+.log p{margin:4px 0;color:var(--muted)}
+.log p.new{color:var(--text)}
+.log p.alert{color:var(--crit);font-weight:600}
+</style>
+</head>
+<body>
+
+<div id="splash" aria-label="CareBeat – tap to continue">
+  <svg viewBox="0 0 120 120" aria-hidden="true">
+    <path class="heart" d="M60 100 C20 70 14 40 34 28 C46 21 56 28 60 36 C64 28 74 21 86 28 C106 40 100 70 60 100Z" fill="#e53935"/>
+    <polyline class="line" points="22,58 44,58 52,40 62,78 70,52 76,58 98,58" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <p class="name">CareBeat</p>
+  <p class="tag">Ward monitoring, always on</p>
+</div>
+
+<div class="app" id="app">
+  <div class="head">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 100 C20 70 14 40 34 28 C46 21 56 28 60 36 C64 28 74 21 86 28 C106 40 100 70 60 100Z" fill="#e53935"/>
+      <polyline points="22,58 44,58 52,40 62,78 70,52 76,58 98,58" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <h1>CareBeat · Ward 4</h1>
+      <p class="sub">Bed 12 · live vitals refresh every 2 seconds</p>
+    </div>
+    <button type="button" class="fs-btn" id="fsBtn" aria-label="Toggle full screen">⛶ Full screen</button>
+  </div>
+
+  <div class="setting">
+    <div class="info">
+      <p class="title">Critical alert mode</p>
+      <p class="desc">Turns on automatically when any vital goes critical. Each monitor then sounds its own alarm.</p>
+    </div>
+    <label class="switch" for="alertToggle">
+      <span class="state" id="stateText">Off</span>
+      <input type="checkbox" id="alertToggle" role="switch" aria-label="Critical alert mode">
+    </label>
+  </div>
+
+  <div class="banner" id="banner">Alert mode is off. It will switch on automatically at the first critical reading.</div>
+  <p class="hint" id="hint"></p>
+
+  <div class="grid" id="grid"></div>
+  <div class="log" id="log"><p>Event log</p></div>
+</div>
+
+<script>
+(function () {
+  var KEY = 'careBeat.alertMode';
+  var app = document.getElementById('app');
+  var toggle = document.getElementById('alertToggle');
+  var stateText = document.getElementById('stateText');
+  var banner = document.getElementById('banner');
+  var grid = document.getElementById('grid');
+  var log = document.getElementById('log');
+  var splash = document.getElementById('splash');
+  var hint = document.getElementById('hint');
+
+  /* ---------- Entrance logo ---------- */
+  function hideSplash() { splash.classList.add('hide'); }
+  var fsBtn = document.getElementById('fsBtn');
+  function isFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function enterFs() {
+    var el = document.documentElement;
+    try {
+      var p = (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+  function exitFs() {
+    try { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {}
+  }
+  function syncFsLabel() { fsBtn.textContent = isFs() ? '✕ Exit full screen' : '⛶ Full screen'; }
+  fsBtn.addEventListener('click', function () { isFs() ? exitFs() : enterFs(); });
+  document.addEventListener('fullscreenchange', syncFsLabel);
+  document.addEventListener('webkitfullscreenchange', syncFsLabel);
+  // Entering the app (tap on the logo screen) opens full screen
+  splash.addEventListener('click', function () { enterFs(); hideSplash(); });
+  setTimeout(hideSplash, 2600);
+
+  /* ---------- Sound (Web Audio) ---------- */
+  var audioCtx = null;
+  function getCtx() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) { audioCtx = null; }
+    return audioCtx;
+  }
+  function audioReady() { return audioCtx && audioCtx.state === 'running'; }
+  function beep(freq, start, dur, vol, type) {
+    var ctx = getCtx(); if (!ctx) return;
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type || 'square'; o.frequency.value = freq;
+    var t = ctx.currentTime + start;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.12, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function chime(on) { on ? (beep(660, 0, 0.12, .1), beep(880, 0.14, 0.18, .1)) : beep(440, 0, 0.2, .1); }
+  function unlock() {
+    getCtx();
+    beep(1, 0, 0.01, 0.0001); // silent primer
+    setTimeout(function () {
+      if (audioReady()) {
+        hint.textContent = '';
+        ['pointerdown', 'keydown', 'touchstart', 'click'].forEach(function (ev) { document.removeEventListener(ev, unlock); });
+      }
+    }, 100);
+  }
+  document.addEventListener('pointerdown', unlock);
+  document.addEventListener('keydown', unlock);
+  document.addEventListener('touchstart', unlock);
+  document.addEventListener('click', unlock);
+
+  /* ---------- Waveforms (return 0..1, 1 = top) ---------- */
+  function g(p, c, w) { return Math.exp(-Math.pow((p - c) / w, 2)); }
+  function ecgWave(p) { return 0.3 + 0.12 * g(p,.18,.035) - 0.15 * g(p,.36,.012) + 1.0 * g(p,.40,.014) - 0.25 * g(p,.44,.014) + 0.28 * g(p,.68,.06); }
+  function plethWave(p) { return 0.1 + 0.8 * g(p,.25,.12) + 0.25 * g(p,.55,.09); }
+  function bpWave(p) { return 0.1 + 0.85 * g(p,.22,.08) + 0.3 * g(p,.5,.07); }
+  function respWave(p) { return 0.5 + 0.4 * Math.sin(p * 2 * Math.PI); }
+
+  /* ---------- Monitors (each has its own alarm tone) ---------- */
+  var mons = [
+    { id:'hr',   label:'Heart rate · ECG',    unit:'bpm',  min:60,   max:100,  base:80,  spread:60, dec:0, wide:true, wave:ecgWave,   rate:'hr',   tone:880,  type:'square' },
+    { id:'spo2', label:'Oxygen · SpO₂',       unit:'%',    min:94,   max:100,  base:97,  spread:9,  dec:0, wave:plethWave, rate:'hr',   tone:988,  type:'square' },
+    { id:'temp', label:'Temperature',         unit:'°C',   min:36.1, max:37.8, base:37,  spread:3,  dec:1, lo:35, hi:40, trend:true,  tone:660,  type:'triangle' },
+    { id:'sys',  label:'Systolic BP',         unit:'mmHg', min:90,   max:140,  base:118, spread:70, dec:0, wave:bpWave,    rate:'hr',   tone:740,  type:'sawtooth' },
+    { id:'resp', label:'Respiration',         unit:'/min', min:12,   max:20,   base:16,  spread:12, dec:0, wave:respWave,  rate:'self', tone:520,  type:'sine' }
+  ];
+  var W = 400;
+  mons.forEach(function (m) {
+    m.val = m.base; m.phase = 0; m.muted = false; m.crit = false;
+    m.H = m.wide ? 100 : 70;
+    m.trace = new Array(W).fill(m.H * 0.6);
+    var d = document.createElement('div');
+    d.className = 'mon' + (m.wide ? ' wide' : ''); d.id = 'm-' + m.id;
+    d.innerHTML =
+      '<div class="top"><span>' + m.label + '</span><span class="status">Normal</span></div>' +
+      '<div class="val"><span class="num">--</span><small>' + m.unit + '</small></div>' +
+      '<canvas width="' + W + '" height="' + m.H + '"></canvas>' +
+      '<div class="foot"><span>Normal ' + m.min + '–' + m.max + ' ' + m.unit + '</span>' +
+      '<button type="button" class="snd" aria-label="Toggle ' + m.label + ' alarm sound">🔊 Sound on</button></div>';
+    grid.appendChild(d);
+    m.el = d; m.cx = d.querySelector('canvas').getContext('2d');
+    m.num = d.querySelector('.num'); m.status = d.querySelector('.status');
+    var btn = d.querySelector('.snd');
+    btn.addEventListener('click', function () {
+      m.muted = !m.muted;
+      btn.classList.toggle('muted', m.muted);
+      btn.textContent = m.muted ? '🔇 Sound off' : '🔊 Sound on';
+      if (!m.muted) beep(m.tone, 0, 0.15, .1, m.type);
+    });
+  });
+  function byId(id) { return mons.filter(function (m) { return m.id === id; })[0]; }
+
+  function addLog(text, cls) {
+    var p = document.createElement('p');
+    p.className = cls || '';
+    p.textContent = new Date().toLocaleTimeString() + ' – ' + text;
+    log.insertBefore(p, log.children[1] || null);
+    while (log.children.length > 30) log.removeChild(log.lastChild);
+  }
+
+  /* ---------- Toggle logic ---------- */
+  function applyState(on, announce) {
+    app.classList.toggle('alert-on', on);
+    stateText.textContent = on ? 'On' : 'Off';
+    banner.textContent = on
+      ? 'Alert mode is on. Critical vitals turn red and each monitor sounds its alarm.'
+      : 'Alert mode is off. It will switch on automatically at the first critical reading.';
+    if (!on) app.classList.remove('has-critical');
+    if (announce) { addLog('Critical alert mode turned ' + (on ? 'on' : 'off'), 'new'); chime(on); }
+  }
+  function save(on) { try { localStorage.setItem(KEY, on ? 'true' : 'false'); } catch (e) {} }
+  function load() { try { return localStorage.getItem(KEY) === 'true'; } catch (e) { return false; } }
+
+  toggle.addEventListener('change', function () {
+    applyState(toggle.checked, true);
+    save(toggle.checked);
+    refreshCritical();
+  });
+
+  function refreshCritical() {
+    var any = mons.some(function (m) { return m.crit; });
+    app.classList.toggle('has-critical', any && toggle.checked);
+    return any;
+  }
+
+  /* ---------- Data tick ---------- */
+  function tick() {
+    var newlyCritical = [];
+    mons.forEach(function (m) {
+      m.val = m.base + (Math.random() - 0.5) * m.spread;
+      var low = m.val < m.min, high = m.val > m.max, out = low || high;
+      if (out && !m.crit) newlyCritical.push(m);
+      m.crit = out;
+      m.el.classList.toggle('critical', out);
+      m.num.textContent = m.val.toFixed(m.dec);
+      m.status.textContent = out ? (high ? 'High' : 'Low') : 'Normal';
+    });
+    var any = mons.some(function (m) { return m.crit; });
+
+    // Automatic critical stage: switch alert mode on by itself
+    if (any && !toggle.checked) {
+      toggle.checked = true;
+      applyState(true, false);
+      save(true);
+      addLog('Critical stage detected – alert mode turned on automatically', 'alert');
+    }
+    if (toggle.checked) {
+      newlyCritical.forEach(function (m) {
+        addLog('ALERT: ' + m.label + ' ' + m.val.toFixed(m.dec) + ' ' + m.unit, 'alert');
+      });
+      // Every critical monitor sounds its own tone, staggered so they stay distinct
+      mons.forEach(function (m, i) {
+        if (m.crit && !m.muted) {
+          var off = i * 0.38;
+          beep(m.tone, off, 0.14, .1, m.type);
+          beep(m.tone, off + 0.18, 0.14, .1, m.type);
+        }
+      });
+      if (any && !audioReady()) hint.textContent = 'Tap anywhere on the page to allow alarm sound.';
+      else if (audioReady()) hint.textContent = '';
+    }
+    refreshCritical();
+  }
+
+  /* ---------- Drawing ---------- */
+  var last = performance.now();
+  function frame(now) {
+    var dt = Math.min(0.1, (now - last) / 1000); last = now;
+    var px = Math.max(1, Math.round(dt * 100));
+    var redOn = toggle.checked;
+    mons.forEach(function (m) {
+      var bps = m.trend ? 0 : (m.rate === 'hr' ? byId('hr').val / 60 : m.val / 60);
+      for (var i = 0; i < px; i++) {
+        var y;
+        if (m.trend) {
+          y = 0.15 + 0.7 * (m.val - m.lo) / (m.hi - m.lo) + (Math.random() - 0.5) * 0.02;
+        } else {
+          var prev = m.phase;
+          m.phase = (m.phase + bps / 100) % 1;
+          // heartbeat beep on every R-peak, always on
+          if (m.id === 'hr' && !m.muted && prev < 0.4 && m.phase >= 0.4 && audioReady()) beep(1000, 0, 0.05, 0.05, 'sine');
+          y = m.wave(m.phase);
+        }
+        m.trace.shift();
+        m.trace.push(m.H - 8 - y * (m.H - 20));
+      }
+      var cx = m.cx, H = m.H;
+      cx.clearRect(0, 0, W, H);
+      cx.strokeStyle = 'rgba(80,200,170,.12)'; cx.lineWidth = 1;
+      for (var x = 0; x < W; x += 30) { cx.beginPath(); cx.moveTo(x, 0); cx.lineTo(x, H); cx.stroke(); }
+      for (var yy = 0; yy < H; yy += 20) { cx.beginPath(); cx.moveTo(0, yy); cx.lineTo(W, yy); cx.stroke(); }
+      cx.strokeStyle = (m.crit && redOn) ? '#ff5252' : '#3ddc97';
+      cx.lineWidth = 2; cx.lineJoin = 'round';
+      cx.beginPath();
+      for (var k = 0; k < W; k++) { k ? cx.lineTo(k, m.trace[k]) : cx.moveTo(0, m.trace[0]); }
+      cx.stroke();
+    });
+    requestAnimationFrame(frame);
+  }
+
+  /* ---------- Init ---------- */
+  toggle.checked = load();
+  applyState(toggle.checked, false);
+  addLog(toggle.checked ? 'Restored saved setting: alert mode on' : 'Alert mode off – will turn on automatically when a vital is critical', '');
+  hint.textContent = 'Tap anywhere on the page to turn sound on. After that it stays on.';
+  tick();
+  setInterval(tick, 2000);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

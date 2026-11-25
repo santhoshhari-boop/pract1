@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harbor – Studio Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* 1. COLORS + FONT TOKENS ---------------------------------- */
+:root{
+  --ink:#16272b; --sidebar:#12343b; --sidebar-hi:#1c4a53;
+  --paper:#eef2f1; --card:#ffffff; --line:#d9e1df;
+  --text:#1b2528; --muted:#5d6e72;
+  --accent:#e9a23b; --accent-ink:#4a2f05;
+  --ok:#2f8f6b; --warn:#c47a10; --bad:#c9404f;
+  --radius:14px; --shadow:0 1px 2px rgba(18,52,59,.08),0 6px 20px -8px rgba(18,52,59,.18);
+  --head:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --side-w:248px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0e1a1d; --card:#15262a; --line:#27393d;
+    --text:#e6eeed; --muted:#94a8ab; --shadow:0 1px 2px rgba(0,0,0,.4);
+    --accent-ink:#2b1a02; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0e1a1d; --card:#15262a; --line:#27393d;
+  --text:#e6eeed; --muted:#94a8ab; --shadow:0 1px 2px rgba(0,0,0,.4);
+  --accent-ink:#2b1a02; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+
+/* 2. BOX MODEL RESET -------------------------------------- */
+*,*::before,*::after{box-sizing:border-box;margin:0}
+
+/* 3. FONT STYLING + BACKGROUND ----------------------------- */
+body{
+  font:400 15px/1.55 var(--body);
+  color:var(--text);
+  background:var(--paper);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--head);line-height:1.15;letter-spacing:-.01em}
+h1{font-size:1.9rem;font-weight:800}
+h2{font-size:1.1rem;font-weight:700}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* 4. POSITIONING: fixed sidebar ---------------------------- */
+.sidebar{
+  position:fixed; top:0; left:0; bottom:0;
+  width:var(--side-w);
+  padding:calc(24px + env(safe-area-inset-top,0px)) 16px 20px;
+  background:var(--sidebar);
+  color:#d7e5e3;
+  display:flex; flex-direction:column; gap:28px;
+  z-index:20;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:0 10px;font:800 1.35rem var(--head);color:#fff}
+.brand-mark{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--accent);
+  display:grid;place-items:center;color:var(--accent-ink);font-size:1rem;
+}
+.nav{display:flex;flex-direction:column;gap:4px;list-style:none;padding:0}
+.nav a{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;border-radius:10px;
+  font-weight:500;
+  border-left:3px solid transparent;
+  transition:background .18s,border-color .18s,padding-left .18s;
+}
+.nav a:hover{background:var(--sidebar-hi);padding-left:16px}           /* hover effect */
+.nav a.active{background:var(--sidebar-hi);border-left-color:var(--accent);color:#fff}
+.nav .count{
+  margin-left:auto;font-size:.75rem;font-weight:600;
+  padding:1px 8px;border-radius:99px;background:rgba(255,255,255,.12);
+}
+.side-card{
+  margin-top:auto;padding:16px;border-radius:var(--radius);
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  font-size:.85rem;
+}
+.side-card strong{display:block;color:#fff;margin-bottom:4px}
+.meter{height:6px;border-radius:99px;background:rgba(255,255,255,.15);margin-top:10px;overflow:hidden}
+.meter>i{display:block;height:100%;width:72%;background:var(--accent)}
+
+/* 5. LAYOUT: offset content beside the fixed sidebar ------- */
+.main{margin-left:var(--side-w);min-height:100vh}
+
+/* sticky top bar */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:10;
+  display:flex;align-items:center;gap:16px;
+  padding:14px 32px;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.search{
+  flex:1;max-width:420px;height:40px;
+  padding:0 14px;
+  border:1px solid var(--line);border-radius:10px;
+  background:var(--card);color:var(--text);font:inherit;
+  transition:border-color .15s,box-shadow .15s;
+}
+.search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(233,162,59,.25)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+.icon-btn{
+  position:relative; width:40px;height:40px;border-radius:10px;
+  border:1px solid var(--line);background:var(--card);color:var(--text);
+  cursor:pointer;font-size:1.05rem;transition:transform .15s,border-color .15s;
+}
+.icon-btn:hover{transform:translateY(-2px);border-color:var(--accent)}
+.icon-btn .dot{                                                      /* absolute inside relative */
+  position:absolute;top:7px;right:8px;width:9px;height:9px;border-radius:50%;
+  background:var(--bad);border:2px solid var(--card);
+}
+.avatar{
+  width:40px;height:40px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--sidebar);color:#fff;font:700 .85rem var(--head);
+}
+
+/* 6. BUTTONS ------------------------------------------------ */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  height:40px;padding:0 18px;
+  border:1px solid transparent;border-radius:10px;
+  font:600 .9rem var(--body);cursor:pointer;
+  transition:transform .15s,box-shadow .15s,background .15s;
+}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 18px -6px rgba(233,162,59,.7)}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{background:var(--card);border-color:var(--muted)}
+
+/* 7. PAGE CONTENT ------------------------------------------ */
+.content{max-width:1280px;margin:0 auto;padding:32px}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.page-head p{color:var(--muted);margin-top:6px;max-width:52ch}
+.page-head .btns{display:flex;gap:10px}
+
+/* stat cards: CSS grid */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px}
+.stat{
+  padding:20px 22px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-top:4px solid var(--accent);                                 /* border as information: category colour */
+  border-radius:var(--radius);box-shadow:var(--shadow);
+  transition:transform .2s,box-shadow .2s;
+}
+.stat:hover{transform:translateY(-4px);box-shadow:0 14px 28px -12px rgba(18,52,59,.35)}
+.stat.ok{border-top-color:var(--ok)} .stat.warn{border-top-color:var(--warn)} .stat.bad{border-top-color:var(--bad)}
+.stat small{color:var(--muted);font-weight:500}
+.stat .num{font:800 2.2rem/1.1 var(--head);margin:6px 0 4px}
+.stat .delta{font-size:.82rem;font-weight:600;color:var(--ok)}
+.stat .delta.down{color:var(--bad)}
+
+/* two-column main grid */
+.grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:24px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line)}
+.card-head a{font-size:.85rem;font-weight:600;color:var(--muted);transition:color .15s}
+.card-head a:hover{color:var(--text);text-decoration:underline}
+.card-body{padding:22px}
+
+/* table with text alignment */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th{
+  text-align:left;padding:12px 22px;
+  font-size:.8rem;font-weight:600;color:var(--muted);
+  background:color-mix(in srgb,var(--paper) 60%,var(--card));
+}
+td{padding:16px 22px;border-top:1px solid var(--line);vertical-align:middle}
+th.r,td.r{text-align:right}   th.c,td.c{text-align:center}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.proj{font-weight:600}
+.proj span{display:block;font-weight:400;font-size:.82rem;color:var(--muted)}
+.bar{height:8px;width:140px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:inherit;background:var(--ok)}
+.bar.warn>i{background:var(--warn)} .bar.bad>i{background:var(--bad)}
+.pill{display:inline-block;padding:3px 11px;border-radius:99px;font-size:.78rem;font-weight:600}
+.pill.ok{background:rgba(47,143,107,.15);color:var(--ok)}
+.pill.warn{background:rgba(196,122,16,.16);color:var(--warn)}
+.pill.bad{background:rgba(201,64,79,.15);color:var(--bad)}
+
+/* task list */
+.tasks{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.task{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border:1px solid var(--line);border-radius:10px;
+  transition:border-color .15s,transform .15s;
+}
+.task:hover{border-color:var(--accent);transform:translateX(4px)}
+.task input{width:18px;height:18px;accent-color:var(--ok)}
+.task b{font-weight:500}
+.task time{margin-left:auto;font-size:.8rem;color:var(--muted);white-space:nowrap}
+
+/* activity feed with absolutely positioned timeline */
+.feed{list-style:none;padding:0 0 0 22px;position:relative}
+.feed::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.feed li{position:relative;padding:0 0 18px;font-size:.9rem}
+.feed li:last-child{padding-bottom:0}
+.feed li::before{
+  content:"";position:absolute;left:-22px;top:6px;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--card);border:3px solid var(--accent);
+}
+.feed small{display:block;color:var(--muted)}
+
+/* team */
+.team{display:flex;flex-wrap:wrap;gap:10px}
+.team .avatar{width:44px;height:44px;border:3px solid var(--card);margin-left:-14px;transition:transform .18s}
+.team .avatar:first-child{margin-left:0}
+.team .avatar:hover{transform:translateY(-5px) scale(1.08)}
+.team .avatar:nth-child(2){background:#2f8f6b}.team .avatar:nth-child(3){background:#c47a10}
+.team .avatar:nth-child(4){background:#7b5ea7}.team .avatar:nth-child(5){background:#c9404f}
+
+footer{padding:24px 32px 40px;text-align:center;color:var(--muted);font-size:.85rem}
+
+/* 8. RESPONSIVE --------------------------------------------- */
+/* 9. ENTRANCE LOGO SPLASH (pure CSS, plays once) ------------ */
+.splash{
+  position:fixed; inset:0; z-index:100;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+  background:radial-gradient(circle at 50% 42%,#1c4a53 0%,#12343b 55%,#0b2227 100%);
+  color:#fff;
+  animation:curtain .9s cubic-bezier(.77,0,.18,1) 2.7s forwards;
+}
+.splash-logo{position:relative;width:132px;height:132px;display:grid;place-items:center}
+.splash-logo::before{            /* saffron disc that blooms behind the anchor */
+  content:"";position:absolute;inset:0;border-radius:36px;
+  background:var(--accent);
+  transform:scale(0) rotate(-45deg);
+  animation:bloom .8s cubic-bezier(.2,1.3,.4,1) 1.1s forwards;
+}
+.splash-logo::after{             /* expanding halo ring */
+  content:"";position:absolute;inset:0;border-radius:36px;
+  border:2px solid var(--accent);opacity:0;
+  animation:halo 1.1s ease-out 1.5s forwards;
+}
+.splash svg{position:relative;width:76px;height:76px;z-index:1;overflow:visible}
+.splash svg *{
+  fill:none;stroke:#fff;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:1;stroke-dashoffset:1;
+  animation:draw .9s ease-in-out forwards, ink .4s ease 1.3s forwards;
+}
+.splash svg *:nth-child(2){animation-delay:.25s,1.3s}
+.splash svg *:nth-child(3){animation-delay:.5s,1.3s}
+.splash svg *:nth-child(4){animation-delay:.7s,1.3s}
+.splash-word{display:flex;font:800 3rem/1 var(--head);letter-spacing:.02em;overflow:hidden;padding-bottom:6px}
+.splash-word span{
+  display:inline-block;transform:translateY(110%);
+  animation:rise .6s cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay:calc(1.4s + var(--i) * .06s);
+}
+.splash-tag{
+  font-size:.95rem;color:#a9c4c1;opacity:0;letter-spacing:.04em;
+  animation:fade .6s ease 1.95s forwards;
+}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes ink{to{stroke:#4a2f05}}
+@keyframes bloom{to{transform:scale(1) rotate(0)}}
+@keyframes halo{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.9)}}
+@keyframes rise{to{transform:translateY(0)}}
+@keyframes fade{to{opacity:1}}
+@keyframes curtain{to{transform:translateY(-100%);visibility:hidden}}
+
+@media (max-width:1100px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+@media (max-width:760px){
+  :root{--side-w:0px}
+  .sidebar{display:none}
+  .topbar{padding:12px 16px}.content{padding:20px 16px}
+  .stats{grid-template-columns:1fr}
+  h1{font-size:1.55rem}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.splash{display:none}}
+</style>
+</head>
+<body>
+
+<div class="splash" aria-hidden="true">
+  <div class="splash-logo">
+    <svg viewBox="0 0 64 64">
+      <circle cx="32" cy="12" r="5" pathLength="1"/>
+      <path d="M32 17V56" pathLength="1"/>
+      <path d="M22 27H42" pathLength="1"/>
+      <path d="M10 38C12 50 21 56 32 56C43 56 52 50 54 38" pathLength="1"/>
+    </svg>
+  </div>
+  <div class="splash-word"><span style="--i:0">H</span><span style="--i:1">a</span><span style="--i:2">r</span><span style="--i:3">b</span><span style="--i:4">o</span><span style="--i:5">r</span></div>
+  <div class="splash-tag">Studio projects, steady and on course</div>
+</div>
+
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">H</span>Harbor</div>
+  <ul class="nav">
+    <li><a class="active" href="#overview">Overview</a></li>
+    <li><a href="#projects">Projects <span class="count">12</span></a></li>
+    <li><a href="#tasks">My tasks <span class="count">5</span></a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#reports">Reports</a></li>
+    <li><a href="#settings">Settings</a></li>
+  </ul>
+  <div class="side-card">
+    <strong>Studio capacity</strong>
+    72% of this month’s hours are booked.
+    <div class="meter"><i></i></div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <input class="search" type="search" placeholder="Search projects, tasks, people" aria-label="Search">
+    <div class="top-actions">
+      <button class="icon-btn" aria-label="Notifications">🔔<span class="dot"></span></button>
+      <div class="avatar" title="Meera Nair">MN</div>
+    </div>
+  </header>
+
+  <main class="content" id="overview">
+    <div class="page-head">
+      <div>
+        <h1>Good morning, Meera</h1>
+        <p>Three projects ship this month. Two need your review before Friday.</p>
+      </div>
+      <div class="btns">
+        <button class="btn btn-ghost">Export report</button>
+        <button class="btn btn-primary">New project</button>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="Summary">
+      <article class="stat"><small>Active projects</small><div class="num">12</div><span class="delta">+2 since last month</span></article>
+      <article class="stat ok"><small>Tasks completed</small><div class="num">148</div><span class="delta">+18% this week</span></article>
+      <article class="stat warn"><small>Due this week</small><div class="num">9</div><span class="delta down">3 at risk</span></article>
+      <article class="stat bad"><small>Overdue</small><div class="num">2</div><span class="delta down">Needs attention</span></article>
+    </section>
+
+    <div class="grid">
+      <div class="stack">
+        <section class="card" id="projects">
+          <div class="card-head"><h2>Active projects</h2><a href="#all">View all</a></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Project</th><th>Progress</th><th class="c">Status</th><th class="r">Due</th></tr></thead>
+              <tbody>
+                <tr><td class="proj">Brightwell rebrand<span>Identity and web</span></td><td><div class="bar"><i style="width:86%"></i></div></td><td class="c"><span class="pill ok">On track</span></td><td class="r">Nov 24</td></tr>
+                <tr><td class="proj">Kestrel mobile app<span>Product design</span></td><td><div class="bar warn"><i style="width:54%"></i></div></td><td class="c"><span class="pill warn">At risk</span></td><td class="r">Nov 28</td></tr>
+                <tr><td class="proj">Orchard packaging<span>Print and labels</span></td><td><div class="bar bad"><i style="width:31%"></i></div></td><td class="c"><span class="pill bad">Overdue</span></td><td class="r">Nov 15</td></tr>
+                <tr><td class="proj">Lumen annual report<span>Editorial</span></td><td><div class="bar"><i style="width:68%"></i></div></td><td class="c"><span class="pill ok">On track</span></td><td class="r">Dec 05</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" id="tasks">
+          <div class="card-head"><h2>Today’s tasks</h2><a href="#all-tasks">See all</a></div>
+          <div class="card-body">
+            <ul class="tasks">
+              <li class="task"><input type="checkbox" aria-label="Done"><b>Review Brightwell logo variations</b><time>10:00</time></li>
+              <li class="task"><input type="checkbox" aria-label="Done"><b>Send Kestrel prototype to client</b><time>13:30</time></li>
+              <li class="task"><input type="checkbox" checked aria-label="Done"><b>Approve Orchard print proofs</b><time>Done</time></li>
+              <li class="task"><input type="checkbox" aria-label="Done"><b>Plan Lumen photo shoot</b><time>16:00</time></li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card">
+          <div class="card-head"><h2>Recent activity</h2></div>
+          <div class="card-body">
+            <ul class="feed">
+              <li><b>Arjun</b> uploaded 4 files to Kestrel<small>12 minutes ago</small></li>
+              <li><b>Priya</b> marked Orchard proofs approved<small>1 hour ago</small></li>
+              <li><b>Client</b> commented on Brightwell homepage<small>3 hours ago</small></li>
+              <li><b>Dev</b> opened a new task in Lumen<small>Yesterday</small></li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="card" id="team">
+          <div class="card-head"><h2>Team online</h2></div>
+          <div class="card-body">
+            <div class="team"><div class="avatar">MN</div><div class="avatar">AK</div><div class="avatar">PS</div><div class="avatar">DV</div><div class="avatar">+3</div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <footer>Harbor · Studio project management · Built with pure CSS3</footer>
+</div>
+
+</body>
+</html>

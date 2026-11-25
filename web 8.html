@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ferrowave Industrial – Smart factory automation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef0ee;--surface:#ffffff;--ink:#16222b;--muted:#53626d;--line:#c9d0d2;
+  --steel:#1f3a4d;--steel-ink:#ffffff;--signal:#f0a800;--signal-ink:#16222b;--hero:#16222b;--hero-ink:#f3f5f4;
+  --pad:clamp(16px,4vw,48px);--max:1180px;
+  --head:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f171d;--surface:#18232b;--ink:#e8edee;--muted:#9aa9b1;--line:#2c3b45;
+  --steel:#6fa3c4;--steel-ink:#0f171d;--hero:#0a1015;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f171d;--surface:#18232b;--ink:#e8edee;--muted:#9aa9b1;--line:#2c3b45;--steel:#6fa3c4;--steel-ink:#0f171d;--hero:#0a1015;color-scheme:dark}
+html{scroll-padding-top:calc(72px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 var(--body)}
+img,svg{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--pad)}
+h1,h2,h3{font-family:var(--head);line-height:1.05;margin:0;letter-spacing:.01em}
+h2{font-size:clamp(2rem,4.5vw,3rem);margin-bottom:.5rem}
+h3{font-size:1.5rem;margin-bottom:.4rem}
+section{padding:clamp(48px,8vw,96px) 0}
+.lede{color:var(--muted);max-width:60ch;margin:0 0 2rem}
+.btn{display:inline-block;padding:.85rem 1.4rem;font:600 1rem var(--body);text-decoration:none;border:2px solid transparent;cursor:pointer;min-height:44px}
+.btn.primary{background:var(--signal);color:var(--signal-ink)}
+.btn.ghost{border-color:currentColor}
+.btn:hover{filter:brightness(1.08)}
+
+/* Header */
+header.top{position:sticky;top:0;z-index:20;background:var(--hero);color:var(--hero-ink);padding-top:env(safe-area-inset-top,0px)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font:700 1.6rem var(--head);text-decoration:none;letter-spacing:.03em;display:flex;align-items:center;gap:.5rem}
+.logo i{width:14px;height:14px;background:var(--signal);display:inline-block;transform:skewX(-18deg)}
+nav ul{display:flex;gap:1.75rem;list-style:none;margin:0;padding:0;align-items:center}
+nav a{text-decoration:none;font-weight:500}
+nav a:hover{color:var(--signal)}
+.menu-btn{display:none;background:none;border:2px solid currentColor;color:inherit;padding:.4rem .8rem;font:600 .95rem var(--body);min-height:44px;cursor:pointer}
+
+/* Hero */
+.hero{background:var(--hero);color:var(--hero-ink);padding:clamp(48px,9vw,110px) 0 clamp(40px,7vw,80px);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:auto 0 0 0;height:10px;background:repeating-linear-gradient(-45deg,var(--signal) 0 18px,var(--hero) 18px 36px)}
+.hero .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:var(--pad);align-items:center}
+.hero h1{font-size:clamp(2.6rem,7vw,5.5rem);text-transform:uppercase;margin-bottom:1rem}
+.hero p{max-width:52ch;color:#c4cfd4;font-size:1.1rem;margin:0 0 1.75rem}
+.cta{display:flex;flex-wrap:wrap;gap:.75rem}
+.readout{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);padding:1.25rem;font-size:.95rem}
+.readout b{display:block;font:700 2.4rem var(--head);color:var(--signal);line-height:1}
+.readout dl{margin:1rem 0 0;display:grid;grid-template-columns:auto 1fr;gap:.35rem 1rem}
+.readout dt{color:#9fb0b8}.readout dd{margin:0;text-align:right}
+
+/* Stats */
+.stats{background:var(--steel);color:var(--steel-ink);padding:2rem 0}
+.stats ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.stats strong{display:block;font:700 2.6rem var(--head);line-height:1}
+.stats span{font-size:.95rem;opacity:.9}
+
+/* Solutions */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.card{background:var(--surface);border:1px solid var(--line);border-top:5px solid var(--signal);padding:1.5rem}
+.card p{color:var(--muted);margin:.25rem 0 0}
+.card svg{width:44px;height:44px;margin-bottom:.75rem;stroke:var(--steel);fill:none;stroke-width:2}
+
+/* Specs table */
+.scroll{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:.9rem 1rem;text-align:left;border-bottom:1px solid var(--line)}
+th{font:700 1.15rem var(--head);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+
+/* Contact */
+.contact .wrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--pad)}
+form{display:grid;gap:1rem}
+label{font-weight:600;display:grid;gap:.35rem}
+input,select,textarea{font:inherit;padding:.75rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%;min-height:44px}
+.note{min-height:1.5em;font-weight:600;color:var(--steel)}
+footer{background:var(--hero);color:#9fb0b8;padding:2rem 0;font-size:.9rem}
+footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+
+/* ===== Tablet: 640px – 1023px ===== */
+@media (max-width:1023px){
+  nav ul{gap:1.1rem;font-size:.95rem}
+  .hero .wrap{grid-template-columns:1fr}
+  .readout{max-width:520px}
+  .stats ul{grid-template-columns:repeat(2,1fr)}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .contact .wrap{grid-template-columns:1fr}
+}
+
+/* ===== Mobile: up to 639px ===== */
+@media (max-width:639px){
+  .menu-btn{display:inline-block}
+  nav{position:absolute;left:0;right:0;top:calc(64px + env(safe-area-inset-top,0px));background:var(--hero);display:none;border-top:1px solid rgba(255,255,255,.15)}
+  nav.open{display:block}
+  nav ul{flex-direction:column;align-items:stretch;gap:0;padding:.5rem var(--pad) 1rem}
+  nav li a{display:block;padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .cta .btn{flex:1 1 100%;text-align:center}
+  .cards{grid-template-columns:1fr}
+  .stats ul{gap:1.25rem 1rem}
+  .stats strong{font-size:2.1rem}
+  footer .wrap{flex-direction:column}
+}
+
+/* Large desktop */
+@media (min-width:1440px){:root{--max:1320px}body{font-size:1.0625rem}}
+
+/* ===== Entrance logo ===== */
+.splash{position:fixed;inset:0;z-index:100;background:#0a1015;color:#f3f5f4;display:grid;place-items:center;text-align:center;padding:env(safe-area-inset-top,0px) 16px env(safe-area-inset-bottom,0px);cursor:pointer;animation:splashOut .7s 3.3s ease forwards}
+.splash::after{content:"";position:absolute;inset:auto 0 0 0;height:10px;background:repeating-linear-gradient(-45deg,#f0a800 0 18px,#0a1015 18px 36px);transform:scaleX(0);transform-origin:left;animation:bar 1.4s .6s ease forwards}
+.splash svg{width:min(46vw,190px);height:auto;overflow:visible}
+.splash .ln{fill:none;stroke:#f0a800;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.5s .2s ease forwards}
+.splash .wv{stroke:#f3f5f4;animation-delay:.9s}
+.splash .dot{fill:#f0a800;opacity:0;transform-origin:center;animation:pop .5s 2s ease forwards}
+.splash h2{font:700 clamp(2.2rem,9vw,3.6rem)/1 var(--head);letter-spacing:.14em;text-transform:uppercase;margin:1.4rem 0 .6rem;opacity:0;transform:translateY(10px);animation:rise .7s 1.5s ease forwards}
+.splash p{margin:0;font:500 clamp(.9rem,3.4vw,1.1rem) var(--body);color:#9fb0b8;letter-spacing:.08em;opacity:0;animation:rise .7s 2s ease forwards}
+.splash p b{color:#f0a800;font-weight:600}
+.splash small{display:block;margin-top:2.2rem;font:.8rem var(--body);color:#6d7f89;opacity:0;animation:rise .5s 2.4s ease forwards}
+.splash.gone{display:none}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{0%{opacity:0;transform:scale(0)}70%{transform:scale(1.5)}100%{opacity:1;transform:scale(1)}}
+@keyframes rise{to{opacity:1;transform:none}}
+@keyframes bar{to{transform:scaleX(1)}}
+@keyframes splashOut{to{opacity:0;visibility:hidden}}
+@media (max-width:639px){.splash h2{letter-spacing:.08em}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.splash{display:none}}
+</style>
+</head>
+<body>
+<div class="splash" id="splash" role="img" aria-label="Ferrowave 2028, advanced and smart">
+  <div>
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <path class="ln" pathLength="1" d="M60 6 L108 33 V87 L60 114 L12 87 V33 Z"/>
+      <path class="ln wv" pathLength="1" d="M28 66 C40 40 50 40 60 60 C70 80 80 80 92 54"/>
+      <circle class="dot" cx="92" cy="54" r="6"/>
+    </svg>
+    <h2>Ferrowave</h2>
+    <p><b>2028</b> &nbsp;·&nbsp; Advanced and smart</p>
+    <small>Tap to skip</small>
+  </div>
+</div>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top"><i></i>Ferrowave</a>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav id="nav" aria-label="Main">
+      <ul>
+        <li><a href="#solutions">Solutions</a></li>
+        <li><a href="#specs">Specifications</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a class="btn primary" href="#contact">Request a quote</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Lines that run themselves</h1>
+        <p>Ferrowave builds robotic cells, vision inspection and predictive maintenance for plants that cannot afford unplanned downtime.</p>
+        <div class="cta">
+          <a class="btn primary" href="#contact">Book a plant audit</a>
+          <a class="btn ghost" href="#specs">See specifications</a>
+        </div>
+      </div>
+      <aside class="readout" aria-live="polite">
+        <span>Layout in use</span>
+        <b id="layoutName">Desktop</b>
+        <dl>
+          <dt>Viewport</dt><dd id="vw">–</dd>
+          <dt>Card columns</dt><dd id="cols">3</dd>
+          <dt>Navigation</dt><dd id="navMode">Inline bar</dd>
+        </dl>
+      </aside>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="wrap">
+      <ul>
+        <li><strong>38%</strong><span>less unplanned downtime</span></li>
+        <li><strong>0.02 mm</strong><span>inspection tolerance</span></li>
+        <li><strong>240+</strong><span>plants commissioned</span></li>
+        <li><strong>24/7</strong><span>remote line support</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <section id="solutions">
+    <div class="wrap">
+      <h2>What we install</h2>
+      <p class="lede">Three systems that work alone or together, tied into your existing PLC and MES software.</p>
+      <div class="cards">
+        <article class="card">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="14" cy="34" r="6"/><path d="M14 28V16l14-8 8 10M28 8l4 14h10"/></svg>
+          <h3>Robotic cells</h3>
+          <p>Welding, palletizing and pick-and-place cells that fit a 6 m² footprint and change over in minutes.</p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="28" rx="2"/><circle cx="24" cy="24" r="7"/><path d="M24 17v14M17 24h14"/></svg>
+          <h3>Vision inspection</h3>
+          <p>High-speed cameras flag defects on the line and route rejects before they reach packing.</p>
+        </article>
+        <article class="card">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M4 36l10-14 8 8 10-18 12 12"/><path d="M4 42h40"/></svg>
+          <h3>Predictive maintenance</h3>
+          <p>Vibration and heat sensors warn you about a failing bearing days before it stops production.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="specs" style="background:var(--surface)">
+    <div class="wrap">
+      <h2>Compare our systems</h2>
+      <p class="lede">On small screens the table scrolls sideways inside its own frame.</p>
+      <div class="scroll" tabindex="0" role="region" aria-label="System specifications">
+        <table>
+          <thead><tr><th>System</th><th>Payload / range</th><th>Cycle time</th><th>Typical payback</th></tr></thead>
+          <tbody>
+            <tr><td>FW-R20 robotic cell</td><td>20 kg</td><td>6.5 s</td><td>14 months</td></tr>
+            <tr><td>FW-V4 vision station</td><td>4 cameras, 12 MP</td><td>40 ms per part</td><td>9 months</td></tr>
+            <tr><td>FW-P1 sensor kit</td><td>Up to 64 machines</td><td>Live, 1 s refresh</td><td>11 months</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <div>
+        <h2>Talk to an engineer</h2>
+        <p class="lede">Tell us about your line. A solutions engineer replies within one working day with a site-visit date and a rough budget range.</p>
+      </div>
+      <form id="form" novalidate>
+        <label>Full name<input name="name" required autocomplete="name"></label>
+        <label>Work email<input name="email" type="email" required autocomplete="email"></label>
+        <label>Industry
+          <select name="industry"><option>Automotive</option><option>Food and beverage</option><option>Electronics</option><option>Pharmaceutical</option><option>Other</option></select>
+        </label>
+        <label>What should we automate?<textarea name="msg" rows="4"></textarea></label>
+        <button class="btn primary" type="submit">Send request</button>
+        <p class="note" id="note" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Ferrowave Industrial. Sample content for demonstration.</span>
+    <span>Chennai · Pune · Stuttgart</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var sp=document.getElementById('splash');
+  function hide(){sp.classList.add('gone')}
+  sp.addEventListener('click',hide);
+  sp.addEventListener('animationend',function(e){if(e.animationName==='splashOut')hide()});
+  var btn=document.getElementById('menuBtn'),nav=document.getElementById('nav');
+  btn.addEventListener('click',function(){var o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o)});
+  nav.addEventListener('click',function(e){if(e.target.tagName==='A'){nav.classList.remove('open');btn.setAttribute('aria-expanded','false')}});
+
+  var mob=matchMedia('(max-width:639px)'),tab=matchMedia('(max-width:1023px)');
+  function update(){
+    var n=mob.matches?['Mobile',1,'Menu button']:tab.matches?['Tablet',2,'Compact bar']:['Desktop',3,'Inline bar'];
+    document.getElementById('layoutName').textContent=n[0];
+    document.getElementById('cols').textContent=n[1];
+    document.getElementById('navMode').textContent=n[2];
+    document.getElementById('vw').textContent=innerWidth+' px';
+    if(!mob.matches)nav.classList.remove('open');
+  }
+  addEventListener('resize',update);mob.addEventListener('change',update);tab.addEventListener('change',update);update();
+
+  document.getElementById('form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var f=e.target,note=document.getElementById('note');
+    if(!f.name.value.trim()||!/^\S+@\S+\.\S+$/.test(f.email.value)){note.textContent='Enter your name and a valid work email.';return}
+    note.textContent='Request sent. An engineer will reply within one working day.';f.reset();
+  });
+})();
+</script>
+</body>
+</html>
